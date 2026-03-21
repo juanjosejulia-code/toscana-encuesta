@@ -846,10 +846,18 @@
     state.timestamp = new Date().toISOString();
     state.coupon = generateCode();
 
-    // Guardar en localStorage como base de datos local
+    // Guardar en localStorage como respaldo local
     const db = JSON.parse(localStorage.getItem('toscana_db') || '[]');
     db.push({...state});
     localStorage.setItem('toscana_db', JSON.stringify(db));
+
+    // Enviar a Google Sheets via Apps Script
+    fetch('https://script.google.com/macros/s/AKfycbxoMPyYZiH90u8zheSJSw6gPGcNO_GLFR09GKI3n7FcrOCtJvOr9PnzLL45h10hMdmCeg/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({...state})
+    }).catch(err => console.warn('Error al enviar a Sheets:', err));
 
     // Mostrar éxito
     document.getElementById('couponCode').textContent = state.coupon;
