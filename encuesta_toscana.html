@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toscana · Tu opinión nos importa</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6ef;
+    --warm: #f0e8d8;
+    --espresso: #2c1810;
+    --cafe: #6b3f2a;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --sage: #7a8c6e;
+    --terra: #a05c3b;
+    --text: #3d2b1f;
+    --muted: #8c7b6e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Textura de fondo */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(107,63,42,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 0 36px;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 20px auto 0;
+  }
+
+  .logo-ornament {
+    font-size: 28px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+  }
+
+  .brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: var(--espresso);
+    text-transform: uppercase;
+  }
+
+  .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* Café reward banner */
+  .reward-banner {
+    background: linear-gradient(135deg, var(--espresso) 0%, var(--cafe) 100%);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 32px rgba(44,24,16,0.15);
+    animation: slideIn 0.5s ease;
+  }
+
+  .reward-icon {
+    font-size: 36px;
+    flex-shrink: 0;
+  }
+
+  .reward-text strong {
+    display: block;
+    color: var(--gold-light);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+
+  .reward-text span {
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  /* Progress */
+  .progress-bar {
+    height: 3px;
+    background: var(--warm);
+    border-radius: 2px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--terra));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* Sección */
+  .section {
+    margin-bottom: 40px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--warm);
+  }
+
+  /* Pregunta */
+  .question {
+    margin-bottom: 24px;
+  }
+
+  .question label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--espresso);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .question label .req {
+    color: var(--terra);
+    margin-left: 2px;
+  }
+
+  /* Input elegante */
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="date"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #ddd4c4;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: white;
+    transition: all 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+  }
+
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238c7b6e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  /* Radio / Checkbox custom */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .options-grid.single-col {
+    grid-template-columns: 1fr;
+  }
+
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1.5px solid #ddd4c4;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    text-align: left;
+  }
+
+  .option-btn:hover {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .option-btn.selected {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    color: var(--cafe);
+    font-weight: 500;
+  }
+
+  .option-btn .dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    flex-shrink: 0;
+    transition: all 0.18s;
+    position: relative;
+  }
+
+  .option-btn.selected .dot {
+    border-color: var(--gold);
+    background: var(--gold);
+  }
+
+  .option-btn.selected .dot::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 6px; height: 6px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  .option-btn .sq {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 2px solid #ccc;
+    flex-shrink: 0;
+    transition: all 0.18s;
+    position: relative;
+  }
+
+  .option-btn.selected .sq {
+    border-color: var(--gold);
+    background: var(--gold);
+  }
+
+  .option-btn.selected .sq::after {
+    content: '✓';
+    position: absolute;
+    top: -2px; left: 1px;
+    font-size: 11px;
+    color: white;
+    font-weight: 700;
+  }
+
+  /* Stars */
+  .stars {
+    display: flex;
+    gap: 6px;
+  }
+
+  .star {
+    font-size: 32px;
+    cursor: pointer;
+    transition: transform 0.15s, filter 0.15s;
+    filter: grayscale(1) opacity(0.3);
+  }
+
+  .star:hover, .star.active {
+    filter: grayscale(0) opacity(1);
+    transform: scale(1.15);
+  }
+
+  .star-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    min-height: 16px;
+  }
+
+  /* Slider NPS */
+  .nps-track {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .nps-btn {
+    flex: 1;
+    aspect-ratio: 1;
+    border: 1.5px solid #ddd4c4;
+    border-radius: 8px;
+    background: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--muted);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nps-btn:hover { border-color: var(--gold); color: var(--cafe); }
+  .nps-btn.selected { background: var(--cafe); border-color: var(--cafe); color: white; }
+  .nps-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
+
+  /* Botón enviar */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--espresso) 0%, var(--cafe) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 6px 24px rgba(44,24,16,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(44,24,16,0.25);
+  }
+
+  .submit-btn:active { transform: translateY(0); }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  }
+
+  /* Success screen */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .success-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: popIn 0.5s 0.2s ease both;
+  }
+
+  .success-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--espresso);
+    margin-bottom: 10px;
+  }
+
+  .success-sub {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .coupon {
+    background: linear-gradient(135deg, var(--espresso), var(--cafe));
+    color: white;
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin: 0 auto;
+    max-width: 360px;
+    box-shadow: 0 12px 40px rgba(44,24,16,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .coupon::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+
+  .coupon-icon { font-size: 48px; margin-bottom: 8px; }
+  .coupon-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; letter-spacing: 2px; margin-bottom: 6px; color: var(--gold-light); }
+  .coupon-sub { font-size: 12px; opacity: 0.7; line-height: 1.5; }
+  .coupon-code { margin-top: 16px; padding: 10px 16px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 22px; font-weight: 700; letter-spacing: 4px; color: var(--gold-light); font-family: monospace; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid #e8dece;
+    margin: 8px 0 28px;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .section { animation-delay: calc(var(--i, 0) * 0.07s); }
+
+  @media(max-width: 420px) {
+    .brand { font-size: 36px; letter-spacing: 5px; }
+    .options-grid { grid-template-columns: 1fr; }
+    .nps-btn { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Formulario -->
+  <div id="formView">
+
+    <div class="header">
+      <div class="logo-ornament">✦</div>
+      <div class="brand">Toscana</div>
+      <div class="tagline">Tu opinión construye nuestra experiencia</div>
+    </div>
+
+    <div class="reward-banner">
+      <div class="reward-icon">☕</div>
+      <div class="reward-text">
+        <strong>¡Completa la encuesta y gana un café!</strong>
+        <span>Responde las preguntas y recibe tu cupón de café cortesía al finalizar.</span>
+      </div>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <!-- SECCIÓN 1: Datos básicos -->
+    <div class="section" style="--i:0">
+      <div class="section-label">01 · Cuéntanos sobre ti</div>
+
+      <div class="question">
+        <label>¿Cómo te llamas? <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Tu nombre" required>
+      </div>
+
+      <div class="question">
+        <label>¿Cuál es tu WhatsApp / teléfono?</label>
+        <input type="tel" id="telefono" placeholder="+56 9 XXXX XXXX">
+      </div>
+
+      <div class="question">
+        <label>¿Tu correo electrónico?</label>
+        <input type="email" id="email" placeholder="hola@ejemplo.cl">
+      </div>
+
+      <div class="question">
+        <label>¿En qué rango de edad estás?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="edad" data-val="18-24" onclick="selectOption(this,'edad')"><span class="dot"></span>18 – 24</button>
+          <button class="option-btn" data-group="edad" data-val="25-34" onclick="selectOption(this,'edad')"><span class="dot"></span>25 – 34</button>
+          <button class="option-btn" data-group="edad" data-val="35-49" onclick="selectOption(this,'edad')"><span class="dot"></span>35 – 49</button>
+          <button class="option-btn" data-group="edad" data-val="50+" onclick="selectOption(this,'edad')"><span class="dot"></span>50+</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SECCIÓN 2: Visita -->
+    <div class="section" style="--i:1">
+      <div class="section-label">02 · Tu visita de hoy</div>
+
+      <div class="question">
+        <label>¿Es tu primera vez en Toscana? <span class="req">*</span></label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="primera" data-val="sí" onclick="selectOption(this,'primera')"><span class="dot"></span>Sí, primera vez</button>
+          <button class="option-btn" data-group="primera" data-val="no" onclick="selectOption(this,'primera')"><span class="dot"></span>Ya había venido</button>
+        </div>
+      </div>
+
+      <div class="question" id="frecuencia-block" style="display:none">
+        <label>¿Con qué frecuencia nos visitas?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="frecuencia" data-val="semanal" onclick="selectOption(this,'frecuencia')"><span class="dot"></span>Cada semana</button>
+          <button class="option-btn" data-group="frecuencia" data-val="quincenal" onclick="selectOption(this,'frecuencia')"><span class="dot"></span>Cada 15 días</button>
+          <button class="option-btn" data-group="frecuencia" data-val="mensual" onclick="selectOption(this,'frecuencia')"><span class="dot"></span>Una vez al mes</button>
+          <button class="option-btn" data-group="frecuencia" data-val="ocasional" onclick="selectOption(this,'frecuencia')"><span class="dot"></span>Ocasionalmente</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <label>¿Cuántas personas te acompañan hoy?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="grupo" data-val="solo" onclick="selectOption(this,'grupo')"><span class="dot"></span>Solo/a</button>
+          <button class="option-btn" data-group="grupo" data-val="2" onclick="selectOption(this,'grupo')"><span class="dot"></span>Somos 2</button>
+          <button class="option-btn" data-group="grupo" data-val="3-4" onclick="selectOption(this,'grupo')"><span class="dot"></span>3 – 4</button>
+          <button class="option-btn" data-group="grupo" data-val="5+" onclick="selectOption(this,'grupo')"><span class="dot"></span>5 o más</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <label>¿Qué celebras o cuál es el motivo de tu visita?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="motivo" data-val="almuerzo_trabajo" onclick="selectOption(this,'motivo')"><span class="dot"></span>Almuerzo de trabajo</button>
+          <button class="option-btn" data-group="motivo" data-val="reunion_amigos" onclick="selectOption(this,'motivo')"><span class="dot"></span>Reunión con amigos</button>
+          <button class="option-btn" data-group="motivo" data-val="cita_pareja" onclick="selectOption(this,'motivo')"><span class="dot"></span>Cita en pareja</button>
+          <button class="option-btn" data-group="motivo" data-val="familiar" onclick="selectOption(this,'motivo')"><span class="dot"></span>Salida familiar</button>
+          <button class="option-btn" data-group="motivo" data-val="celebracion" onclick="selectOption(this,'motivo')"><span class="dot"></span>Celebración especial</button>
+          <button class="option-btn" data-group="motivo" data-val="casual" onclick="selectOption(this,'motivo')"><span class="dot"></span>Visita casual</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SECCIÓN 3: ¿Cómo llegaron? -->
+    <div class="section" style="--i:2">
+      <div class="section-label">03 · ¿Cómo nos encontraste?</div>
+
+      <div class="question">
+        <label>¿Por qué medio nos conociste? <span class="req">*</span></label>
+        <div class="options-grid single-col">
+          <button class="option-btn" data-group="canal" data-val="instagram" onclick="selectOption(this,'canal')"><span class="dot"></span>📸 Instagram / Facebook</button>
+          <button class="option-btn" data-group="canal" data-val="google" onclick="selectOption(this,'canal')"><span class="dot"></span>🔍 Google / Maps</button>
+          <button class="option-btn" data-group="canal" data-val="recomendacion" onclick="selectOption(this,'canal')"><span class="dot"></span>💬 Recomendación de alguien</button>
+          <button class="option-btn" data-group="canal" data-val="pasaba" onclick="selectOption(this,'canal')"><span class="dot"></span>🚶 Pasaba por aquí</button>
+          <button class="option-btn" data-group="canal" data-val="prensa" onclick="selectOption(this,'canal')"><span class="dot"></span>📰 Prensa / Revista</button>
+          <button class="option-btn" data-group="canal" data-val="ya_conocia" onclick="selectOption(this,'canal')"><span class="dot"></span>⭐ Ya te conocía hace tiempo</button>
+        </div>
+      </div>
+
+      <div class="question" id="quien-recomienda" style="display:none">
+        <label>¿Quién te lo recomendó? (opcional)</label>
+        <input type="text" id="recomendador" placeholder="Nombre o relación (amigo, colega...)">
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SECCIÓN 4: Satisfacción -->
+    <div class="section" style="--i:3">
+      <div class="section-label">04 · ¿Cómo estuvo todo?</div>
+
+      <div class="question">
+        <label>Califica tu experiencia general <span class="req">*</span></label>
+        <div class="stars" id="stars-general">
+          <span class="star" data-star="1" onclick="setStar('general',1)">⭐</span>
+          <span class="star" data-star="2" onclick="setStar('general',2)">⭐</span>
+          <span class="star" data-star="3" onclick="setStar('general',3)">⭐</span>
+          <span class="star" data-star="4" onclick="setStar('general',4)">⭐</span>
+          <span class="star" data-star="5" onclick="setStar('general',5)">⭐</span>
+        </div>
+        <div class="star-label" id="label-general"></div>
+      </div>
+
+      <div class="question">
+        <label>Califica la calidad de los platos</label>
+        <div class="stars" id="stars-comida">
+          <span class="star" data-star="1" onclick="setStar('comida',1)">🍽️</span>
+          <span class="star" data-star="2" onclick="setStar('comida',2)">🍽️</span>
+          <span class="star" data-star="3" onclick="setStar('comida',3)">🍽️</span>
+          <span class="star" data-star="4" onclick="setStar('comida',4)">🍽️</span>
+          <span class="star" data-star="5" onclick="setStar('comida',5)">🍽️</span>
+        </div>
+        <div class="star-label" id="label-comida"></div>
+      </div>
+
+      <div class="question">
+        <label>Califica el servicio / atención</label>
+        <div class="stars" id="stars-servicio">
+          <span class="star" data-star="1" onclick="setStar('servicio',1)">👨‍🍳</span>
+          <span class="star" data-star="2" onclick="setStar('servicio',2)">👨‍🍳</span>
+          <span class="star" data-star="3" onclick="setStar('servicio',3)">👨‍🍳</span>
+          <span class="star" data-star="4" onclick="setStar('servicio',4)">👨‍🍳</span>
+          <span class="star" data-star="5" onclick="setStar('servicio',5)">👨‍🍳</span>
+        </div>
+        <div class="star-label" id="label-servicio"></div>
+      </div>
+
+      <div class="question">
+        <label>Califica el ambiente / decoración</label>
+        <div class="stars" id="stars-ambiente">
+          <span class="star" data-star="1" onclick="setStar('ambiente',1)">✨</span>
+          <span class="star" data-star="2" onclick="setStar('ambiente',2)">✨</span>
+          <span class="star" data-star="3" onclick="setStar('ambiente',3)">✨</span>
+          <span class="star" data-star="4" onclick="setStar('ambiente',4)">✨</span>
+          <span class="star" data-star="5" onclick="setStar('ambiente',5)">✨</span>
+        </div>
+        <div class="star-label" id="label-ambiente"></div>
+      </div>
+
+      <div class="question">
+        <label>¿La relación precio–calidad te pareció…?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="precio" data-val="excelente" onclick="selectOption(this,'precio')"><span class="dot"></span>Excelente</button>
+          <button class="option-btn" data-group="precio" data-val="buena" onclick="selectOption(this,'precio')"><span class="dot"></span>Buena</button>
+          <button class="option-btn" data-group="precio" data-val="regular" onclick="selectOption(this,'precio')"><span class="dot"></span>Regular</button>
+          <button class="option-btn" data-group="precio" data-val="cara" onclick="selectOption(this,'precio')"><span class="dot"></span>Un poco cara</button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SECCIÓN 5: NPS -->
+    <div class="section" style="--i:4">
+      <div class="section-label">05 · Recomendación</div>
+
+      <div class="question">
+        <label>Del 0 al 10, ¿cuánto nos recomendarías a un amigo? <span class="req">*</span></label>
+        <div class="nps-track" id="nps-track">
+          <button class="nps-btn" data-val="0" onclick="setNPS(0)">0</button>
+          <button class="nps-btn" data-val="1" onclick="setNPS(1)">1</button>
+          <button class="nps-btn" data-val="2" onclick="setNPS(2)">2</button>
+          <button class="nps-btn" data-val="3" onclick="setNPS(3)">3</button>
+          <button class="nps-btn" data-val="4" onclick="setNPS(4)">4</button>
+          <button class="nps-btn" data-val="5" onclick="setNPS(5)">5</button>
+          <button class="nps-btn" data-val="6" onclick="setNPS(6)">6</button>
+          <button class="nps-btn" data-val="7" onclick="setNPS(7)">7</button>
+          <button class="nps-btn" data-val="8" onclick="setNPS(8)">8</button>
+          <button class="nps-btn" data-val="9" onclick="setNPS(9)">9</button>
+          <button class="nps-btn" data-val="10" onclick="setNPS(10)">10</button>
+        </div>
+        <div class="nps-labels"><span>Poco probable</span><span>Muy probable</span></div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- SECCIÓN 6: Feedback abierto -->
+    <div class="section" style="--i:5">
+      <div class="section-label">06 · Tu voz importa</div>
+
+      <div class="question">
+        <label>¿Qué fue lo que más te gustó hoy?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="gusto" data-val="comida" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>La comida</button>
+          <button class="option-btn" data-group="gusto" data-val="servicio" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>El servicio</button>
+          <button class="option-btn" data-group="gusto" data-val="ambiente" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>El ambiente</button>
+          <button class="option-btn" data-group="gusto" data-val="precio" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>Los precios</button>
+          <button class="option-btn" data-group="gusto" data-val="ubicacion" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>La ubicación</button>
+          <button class="option-btn" data-group="gusto" data-val="carta" onclick="toggleMulti(this,'gusto')"><span class="sq"></span>La variedad de carta</button>
+        </div>
+      </div>
+
+      <div class="question">
+        <label>¿Hay algo que mejorarías o que echaste de menos?</label>
+        <textarea id="mejora" placeholder="Tu feedback es muy valioso para nosotros…"></textarea>
+      </div>
+
+      <div class="question">
+        <label>¿Tienes algún comentario especial para el equipo?</label>
+        <textarea id="comentario" placeholder="¡Cuéntanos lo que quieras!"></textarea>
+      </div>
+
+      <div class="question">
+        <label>¿Cómo prefieres que te contactemos con novedades?</label>
+        <div class="options-grid">
+          <button class="option-btn" data-group="contacto" data-val="whatsapp" onclick="toggleMulti(this,'contacto')"><span class="sq"></span>WhatsApp</button>
+          <button class="option-btn" data-group="contacto" data-val="email" onclick="toggleMulti(this,'contacto')"><span class="sq"></span>Email</button>
+          <button class="option-btn" data-group="contacto" data-val="instagram" onclick="toggleMulti(this,'contacto')"><span class="sq"></span>Instagram</button>
+          <button class="option-btn" data-group="contacto" data-val="ninguno" onclick="toggleMulti(this,'contacto')"><span class="sq"></span>Prefiero no</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">ENVIAR Y OBTENER MI CAFÉ</button>
+
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:16px;line-height:1.6">
+      Tus datos son confidenciales y se usan exclusivamente para mejorar<br>tu experiencia en Toscana.
+    </p>
+
+  </div><!-- /formView -->
+
+  <!-- Pantalla de éxito -->
+  <div id="successView" class="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">¡Muchas gracias!</div>
+    <p class="success-sub">Tu opinión nos ayuda a crecer cada día.<br>Aquí va tu regalo:</p>
+    <div class="coupon">
+      <div class="coupon-icon">☕</div>
+      <div class="coupon-title">CAFÉ CORTESÍA</div>
+      <p class="coupon-sub">Muestra esta pantalla a nuestro equipo<br>y recibe tu café de cortesía.</p>
+      <div class="coupon-code" id="couponCode">TSC-0000</div>
+      <p style="font-size:11px;opacity:0.5;margin-top:10px">Válido solo hoy · No canjeable por dinero</p>
+    </div>
+    <p style="margin-top:28px;font-size:13px;color:var(--muted);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px">
+      ¡Hasta pronto, <span id="nombreCupon"></span>! ✦
+    </p>
+  </div>
+
+</div><!-- /page-wrapper -->
+
+<script>
+  // Estado
+  const state = {
+    nombre:'', telefono:'', email:'',
+    edad:null, primera:null, frecuencia:null, grupo:null, motivo:null,
+    canal:null, recomendador:'',
+    estrellas:{ general:0, comida:0, servicio:0, ambiente:0 },
+    precio:null,
+    nps:null,
+    gusto:[], contacto:[],
+    mejora:'', comentario:'',
+    timestamp: new Date().toISOString(),
+  };
+
+  const starLabels = { 1:'Muy malo', 2:'Malo', 3:'Regular', 4:'Bueno', 5:'¡Excelente!' };
+
+  function selectOption(btn, group) {
+    document.querySelectorAll(`[data-group="${group}"]`).forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state[group] = btn.dataset.val;
+
+    if(group==='primera') {
+      document.getElementById('frecuencia-block').style.display = btn.dataset.val==='no' ? 'block' : 'none';
+    }
+    if(group==='canal') {
+      document.getElementById('quien-recomienda').style.display = btn.dataset.val==='recomendacion' ? 'block' : 'none';
+    }
+    updateProgress();
+  }
+
+  function toggleMulti(btn, group) {
+    btn.classList.toggle('selected');
+    const vals = [...document.querySelectorAll(`[data-group="${group}"].selected`)].map(b=>b.dataset.val);
+    state[group] = vals;
+  }
+
+  function setStar(dim, val) {
+    state.estrellas[dim] = val;
+    const container = document.getElementById(`stars-${dim}`);
+    container.querySelectorAll('.star').forEach((s,i)=> {
+      s.classList.toggle('active', i<val);
+    });
+    document.getElementById(`label-${dim}`).textContent = starLabels[val] || '';
+    updateProgress();
+  }
+
+  function setNPS(val) {
+    state.nps = val;
+    document.querySelectorAll('.nps-btn').forEach(b=>{
+      b.classList.toggle('selected', parseInt(b.dataset.val)===val);
+    });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const required = [state.nombre||document.getElementById('nombre').value, state.primera, state.canal, state.estrellas.general, state.nps];
+    const done = required.filter(v => v!==null && v!=='' && v!==0).length;
+    document.getElementById('progressFill').style.width = (done/required.length*100)+'%';
+  }
+
+  function generateCode() {
+    return 'TSC-' + Math.random().toString(36).substring(2,6).toUpperCase();
+  }
+
+  function submitForm() {
+    const nombre = document.getElementById('nombre').value.trim();
+    if(!nombre) { alert('Por favor ingresa tu nombre.'); return; }
+    if(!state.primera) { alert('Por favor indica si es tu primera visita.'); return; }
+    if(!state.canal) { alert('Por favor indícanos cómo nos conociste.'); return; }
+    if(!state.estrellas.general) { alert('Por favor califica tu experiencia general.'); return; }
+    if(state.nps===null) { alert('Por favor indícanos cuánto nos recomendarías.'); return; }
+
+    // Recopilar estado final
+    state.nombre = nombre;
+    state.telefono = document.getElementById('telefono').value;
+    state.email = document.getElementById('email').value;
+    state.recomendador = document.getElementById('recomendador').value;
+    state.mejora = document.getElementById('mejora').value;
+    state.comentario = document.getElementById('comentario').value;
+    state.timestamp = new Date().toISOString();
+    state.coupon = generateCode();
+
+    // Guardar en localStorage como base de datos local
+    const db = JSON.parse(localStorage.getItem('toscana_db') || '[]');
+    db.push({...state});
+    localStorage.setItem('toscana_db', JSON.stringify(db));
+
+    // Mostrar éxito
+    document.getElementById('couponCode').textContent = state.coupon;
+    document.getElementById('nombreCupon').textContent = nombre.split(' ')[0];
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // Escuchar inputs de texto para progreso
+  document.getElementById('nombre').addEventListener('input', updateProgress);
+  updateProgress();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toscana · Panel de Encuestas</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --gold: #d4a843;
+    --gold-dim: #a07e2e;
+    --green: #3fb950;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --orange: #ffa657;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    flex-shrink: 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-brand {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-brand .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--gold);
+  }
+
+  .sidebar-brand .sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(212,168,67,0.06); }
+
+  /* Main */
+  .main {
+    flex: 1;
+    margin-left: 220px;
+    padding: 28px 32px;
+    max-width: calc(100vw - 220px);
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+  }
+
+  .page-header .sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .btn-export {
+    padding: 8px 18px;
+    background: var(--gold);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-export:hover { opacity: 0.85; }
+
+  /* KPI Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .kpi-card .label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .kpi-card .value {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-card .change {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* Chart grid */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .charts-grid.wide { grid-template-columns: 2fr 1fr; }
+  .charts-grid.triple { grid-template-columns: 1fr 1fr 1fr; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-title span { color: var(--gold); font-size: 18px; font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: 0; }
+
+  /* NPS */
+  .nps-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .nps-big {
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .nps-breakdown { flex: 1; }
+  .nps-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+  .nps-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .nps-bar-fill { height: 100%; border-radius: 3px; }
+
+  /* Tabla de respuestas */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { padding: 10px 12px; text-align: left; color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 9px 12px; border-bottom: 1px solid rgba(33,38,45,0.5); vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .stars-display { color: var(--gold); font-size: 13px; }
+
+  /* Barra de canal */
+  .canal-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+  .canal-name { width: 140px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .canal-track { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .canal-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); }
+  .canal-count { width: 30px; text-align: right; color: var(--muted); }
+
+  /* Demo notice */
+  .demo-banner {
+    background: rgba(212,168,67,0.08);
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tab-bar { display: flex; gap: 2px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .tab { padding: 8px 16px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  @media(max-width:1100px) {
+    .kpi-grid { grid-template-columns: repeat(3,1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .charts-grid.wide { grid-template-columns: 1fr; }
+    .charts-grid.triple { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media(max-width:768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; max-width: 100vw; padding: 20px 16px; }
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="name">TOSCANA</div>
+      <div class="sub">PANEL DE ENCUESTAS</div>
+    </div>
+    <div class="nav-item active" onclick="showTab('dashboard')">📊 Dashboard</div>
+    <div class="nav-item" onclick="showTab('respuestas')">📋 Respuestas</div>
+    <div class="nav-item" onclick="showTab('canales')">📡 Canales</div>
+    <div class="nav-item" onclick="showTab('nps')">⭐ Satisfacción</div>
+    <div class="nav-item" onclick="window.open('encuesta_toscana.html','_blank')">🔗 Ver Encuesta</div>
+    <div class="nav-item" onclick="window.open('qr_toscana.html','_blank')">📱 Ver QR</div>
+    <div style="padding:20px;margin-top:auto;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:40px">
+      Toscana · Sistema de encuestas v1.0
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <h1>Panel de Encuestas</h1>
+        <div class="sub">Indicadores de satisfacción en tiempo real · <span id="totalCount">0</span> respuestas</div>
+      </div>
+      <button class="btn-export" onclick="exportCSV()">⬇ Exportar CSV</button>
+    </div>
+
+    <div class="demo-banner">
+      ℹ️ <span>Los datos se leen desde el navegador (localStorage). Comparte <b>encuesta_toscana.html</b> con tus clientes para empezar a recopilar respuestas reales.</span>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi-card">
+        <div class="label">TOTAL RESPUESTAS</div>
+        <div class="value" id="kpi-total" style="color:var(--gold)">0</div>
+        <div class="change">encuestas completadas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">NPS PROMEDIO</div>
+        <div class="value" id="kpi-nps" style="color:var(--green)">—</div>
+        <div class="change">score de recomendación</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">SATISFACCIÓN GRAL.</div>
+        <div class="value" id="kpi-stars" style="color:var(--gold)">—</div>
+        <div class="change">promedio sobre 5 ⭐</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">PROMOTORES</div>
+        <div class="value" id="kpi-promotores" style="color:var(--green)">0%</div>
+        <div class="change">NPS ≥ 9</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">PRIMERA VISITA</div>
+        <div class="value" id="kpi-nuevos" style="color:var(--blue)">0%</div>
+        <div class="change">clientes nuevos</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <div class="tab active" id="tab-dashboard" onclick="switchSection('dashboard')">Dashboard</div>
+      <div class="tab" id="tab-respuestas" onclick="switchSection('respuestas')">Respuestas</div>
+      <div class="tab" id="tab-canales" onclick="switchSection('canales')">Canales de llegada</div>
+      <div class="tab" id="tab-nps" onclick="switchSection('nps')">Satisfacción</div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <div class="charts-grid wide">
+        <div class="card">
+          <div class="card-title">Respuestas por semana <span id="trend-label"></span></div>
+          <canvas id="chartTimeline" height="90"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Canal de llegada</div>
+          <canvas id="chartCanal" height="140"></canvas>
+        </div>
+      </div>
+      <div class="charts-grid triple">
+        <div class="card">
+          <div class="card-title">Motivo de visita</div>
+          <canvas id="chartMotivo" height="160"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Tamaño de grupo</div>
+          <canvas id="chartGrupo" height="160"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Percepción precio–calidad</div>
+          <canvas id="chartPrecio" height="160"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESPUESTAS -->
+    <div class="section" id="sec-respuestas">
+      <div class="card">
+        <div class="card-title">Últimas respuestas</div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Canal</th>
+                <th>⭐ General</th>
+                <th>NPS</th>
+                <th>Primera?</th>
+                <th>Motivo</th>
+                <th>Precio</th>
+                <th>Mejora</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CANALES -->
+    <div class="section" id="sec-canales">
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-title">¿Cómo nos conocieron?</div>
+          <div id="canalBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Edad de los clientes</div>
+          <canvas id="chartEdad" height="200"></canvas>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">Preferencia de contacto</div>
+        <canvas id="chartContacto" height="80"></canvas>
+      </div>
+    </div>
+
+    <!-- NPS / SATISFACCIÓN -->
+    <div class="section" id="sec-nps">
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-title">NPS Score</div>
+          <div class="nps-display" id="npsDisplay">
+            <div>
+              <div class="nps-big" id="npsScore" style="color:var(--green)">—</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">Net Promoter Score</div>
+            </div>
+            <div class="nps-breakdown" id="npsBreakdown"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Distribución NPS</div>
+          <canvas id="chartNPS" height="160"></canvas>
+        </div>
+      </div>
+      <div class="charts-grid triple" style="margin-top:16px">
+        <div class="card">
+          <div class="card-title">Comida ⭐</div>
+          <div style="font-size:48px;font-weight:700;color:var(--gold);text-align:center;padding:16px 0" id="avgComida">—</div>
+          <canvas id="chartComida" height="80"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Servicio ⭐</div>
+          <div style="font-size:48px;font-weight:700;color:var(--gold);text-align:center;padding:16px 0" id="avgServicio">—</div>
+          <canvas id="chartServicio" height="80"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-title">Ambiente ⭐</div>
+          <div style="font-size:48px;font-weight:700;color:var(--gold);text-align:center;padding:16px 0" id="avgAmbiente">—</div>
+          <canvas id="chartAmbiente" height="80"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Datos de demo (para visualizar el panel desde el primer día)
+const DEMO = [
+  {nombre:"María González",telefono:"+56912345678",email:"maria@gmail.com",edad:"35-49",primera:"no",frecuencia:"mensual",grupo:"2",motivo:"cita_pareja",canal:"instagram",recomendador:"",estrellas:{general:5,comida:5,servicio:4,ambiente:5},precio:"excelente",nps:10,gusto:["comida","ambiente"],contacto:["whatsapp"],mejora:"",comentario:"¡Maravilloso!",timestamp:"2026-03-10T13:22:00Z",coupon:"TSC-AB12"},
+  {nombre:"Carlos Muñoz",telefono:"+56998765432",email:"",edad:"25-34",primera:"sí",frecuencia:null,grupo:"3-4",motivo:"reunion_amigos",canal:"google",recomendador:"",estrellas:{general:4,comida:4,servicio:4,ambiente:3},precio:"buena",nps:8,gusto:["comida","servicio"],contacto:["email"],mejora:"Más opciones vegetarianas",comentario:"",timestamp:"2026-03-12T20:05:00Z",coupon:"TSC-CD34"},
+  {nombre:"Ana Pérez",telefono:"",email:"ana.perez@outlook.com",edad:"18-24",primera:"sí",frecuencia:null,grupo:"2",motivo:"casual",canal:"recomendacion",recomendador:"Amiga Sofía",estrellas:{general:5,comida:5,servicio:5,ambiente:5},precio:"excelente",nps:10,gusto:["comida","servicio","ambiente"],contacto:["instagram"],mejora:"",comentario:"El mejor restaurante del barrio",timestamp:"2026-03-14T14:30:00Z",coupon:"TSC-EF56"},
+  {nombre:"Roberto Díaz",telefono:"+56956781234",email:"",edad:"50+",primera:"no",frecuencia:"semanal",grupo:"solo",motivo:"almuerzo_trabajo",canal:"ya_conocia",recomendador:"",estrellas:{general:4,comida:4,servicio:3,ambiente:4},precio:"buena",nps:7,gusto:["comida"],contacto:["ninguno"],mejora:"El servicio podría ser más rápido",comentario:"",timestamp:"2026-03-15T13:10:00Z",coupon:"TSC-GH78"},
+  {nombre:"Valentina Rojas",telefono:"+56934567890",email:"vale@gmail.com",edad:"25-34",primera:"sí",frecuencia:null,grupo:"2",motivo:"cita_pareja",canal:"instagram",recomendador:"",estrellas:{general:5,comida:5,servicio:5,ambiente:5},precio:"excelente",nps:10,gusto:["ambiente","servicio"],contacto:["whatsapp","instagram"],mejora:"",comentario:"Romántico y delicioso",timestamp:"2026-03-17T20:45:00Z",coupon:"TSC-IJ90"},
+  {nombre:"Felipe Torres",telefono:"",email:"",edad:"35-49",primera:"no",frecuencia:"quincenal",grupo:"3-4",motivo:"familiar",canal:"recomendacion",recomendador:"",estrellas:{general:3,comida:3,servicio:3,ambiente:4},precio:"regular",nps:5,gusto:["ambiente"],contacto:["ninguno"],mejora:"La carta de vinos podría mejorar",comentario:"Regular la pasada",timestamp:"2026-03-18T19:20:00Z",coupon:"TSC-KL12"},
+  {nombre:"Paula Soto",telefono:"+56978901234",email:"paula@empresa.cl",edad:"25-34",primera:"sí",frecuencia:null,grupo:"5+",motivo:"celebracion",canal:"google",recomendador:"",estrellas:{general:5,comida:5,servicio:5,ambiente:4},precio:"excelente",nps:9,gusto:["comida","servicio","precio"],contacto:["email"],mejora:"",comentario:"Perfecta celebración",timestamp:"2026-03-19T21:00:00Z",coupon:"TSC-MN34"},
+  {nombre:"Diego Herrera",telefono:"+56945678901",email:"",edad:"18-24",primera:"sí",frecuencia:null,grupo:"2",motivo:"reunion_amigos",canal:"pasaba",recomendador:"",estrellas:{general:4,comida:4,servicio:4,ambiente:5},precio:"buena",nps:8,gusto:["ambiente","comida"],contacto:["instagram"],mejora:"Música un poco alta",comentario:"",timestamp:"2026-03-20T14:15:00Z",coupon:"TSC-OP56"},
+];
+
+function getData() {
+  const stored = JSON.parse(localStorage.getItem('toscana_db') || '[]');
+  return [...DEMO, ...stored];
+}
+
+function avg(arr) {
+  if(!arr.length) return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+const CANALES = {instagram:'Instagram/FB',google:'Google/Maps',recomendacion:'Recomendación',pasaba:'Pasaba por aquí',prensa:'Prensa/Revista',ya_conocia:'Ya conocía'};
+const MOTIVOS = {almuerzo_trabajo:'Trabajo',reunion_amigos:'Amigos',cita_pareja:'Pareja',familiar:'Familia',celebracion:'Celebración',casual:'Casual'};
+
+const GOLD = 'rgba(212,168,67,0.8)';
+const chartDefaults = {
+  plugins:{ legend:{ labels:{ color:'#7d8590', font:{size:11}, boxWidth:12 } } },
+  scales:{}
+};
+
+let charts = {};
+
+function makeChart(id, type, data, options={}) {
+  if(charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if(!ctx) return;
+  charts[id] = new Chart(ctx, { type, data, options:{...chartDefaults,...options} });
+}
+
+function renderAll() {
+  const data = getData();
+  const n = data.length;
+
+  document.getElementById('totalCount').textContent = n;
+  document.getElementById('kpi-total').textContent = n;
+
+  if(n === 0) {
+    ['kpi-nps','kpi-stars','kpi-promotores','kpi-nuevos'].forEach(id=>document.getElementById(id).textContent='—');
+    return;
+  }
+
+  // KPIs
+  const npsVals = data.map(d=>d.nps).filter(v=>v!==null);
+  const avgNPS = avg(npsVals);
+  document.getElementById('kpi-nps').textContent = Math.round(avgNPS*10)/10;
+
+  const starVals = data.map(d=>d.estrellas?.general||0).filter(v=>v>0);
+  document.getElementById('kpi-stars').textContent = (avg(starVals).toFixed(1)) + ' ⭐';
+
+  const promotores = npsVals.filter(v=>v>=9).length;
+  const detractores = npsVals.filter(v=>v<=6).length;
+  const npsScore = Math.round((promotores-detractores)/npsVals.length*100);
+  document.getElementById('kpi-promotores').textContent = Math.round(promotores/npsVals.length*100)+'%';
+
+  const nuevos = data.filter(d=>d.primera==='sí').length;
+  document.getElementById('kpi-nuevos').textContent = Math.round(nuevos/n*100)+'%';
+
+  // Timeline
+  const byWeek = {};
+  data.forEach(d=>{
+    const w = new Date(d.timestamp).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit'});
+    byWeek[w] = (byWeek[w]||0)+1;
+  });
+  makeChart('chartTimeline','bar',{
+    labels:Object.keys(byWeek),
+    datasets:[{label:'Respuestas',data:Object.values(byWeek),backgroundColor:'rgba(212,168,67,0.5)',borderColor:GOLD,borderWidth:1,borderRadius:4}]
+  },{scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{size:10}}},y:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{size:10}}}}});
+
+  // Canal donut
+  const canalCount = {};
+  data.forEach(d=>{ if(d.canal) canalCount[d.canal]=(canalCount[d.canal]||0)+1; });
+  makeChart('chartCanal','doughnut',{
+    labels:Object.keys(canalCount).map(k=>CANALES[k]||k),
+    datasets:[{data:Object.values(canalCount),backgroundColor:['#d4a843','#3fb950','#58a6ff','#ffa657','#bc8cff','#f85149'],borderWidth:0}]
+  },{plugins:{legend:{labels:{color:'#7d8590',font:{size:11}}}}});
+
+  // Motivo
+  const motivoCount = {};
+  data.forEach(d=>{ if(d.motivo) motivoCount[d.motivo]=(motivoCount[d.motivo]||0)+1; });
+  makeChart('chartMotivo','bar',{
+    labels:Object.keys(motivoCount).map(k=>MOTIVOS[k]||k),
+    datasets:[{label:'',data:Object.values(motivoCount),backgroundColor:'rgba(88,166,255,0.6)',borderColor:'#58a6ff',borderWidth:1,borderRadius:4}]
+  },{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{size:10}}},y:{grid:{display:false},ticks:{color:'#7d8590',font:{size:10}}}}});
+
+  // Grupo
+  const grupoCount={};
+  data.forEach(d=>{ if(d.grupo) grupoCount[d.grupo]=(grupoCount[d.grupo]||0)+1; });
+  makeChart('chartGrupo','pie',{
+    labels:Object.keys(grupoCount),
+    datasets:[{data:Object.values(grupoCount),backgroundColor:['#d4a843','#3fb950','#58a6ff','#ffa657'],borderWidth:0}]
+  },{plugins:{legend:{labels:{color:'#7d8590',font:{size:11}}}}});
+
+  // Precio
+  const precioCount={};
+  data.forEach(d=>{ if(d.precio) precioCount[d.precio]=(precioCount[d.precio]||0)+1; });
+  makeChart('chartPrecio','doughnut',{
+    labels:Object.keys(precioCount).map(k=>({excelente:'Excelente',buena:'Buena',regular:'Regular',cara:'Cara'}[k]||k)),
+    datasets:[{data:Object.values(precioCount),backgroundColor:['#3fb950','#58a6ff','#ffa657','#f85149'],borderWidth:0}]
+  },{plugins:{legend:{labels:{color:'#7d8590',font:{size:11}}}}});
+
+  // Tabla de respuestas
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  [...data].reverse().forEach(d=>{
+    const tr = document.createElement('tr');
+    const date = new Date(d.timestamp).toLocaleDateString('es-CL');
+    const stars = '⭐'.repeat(d.estrellas?.general||0);
+    const npsColor = d.nps>=9?'#3fb950':d.nps>=7?'#ffa657':'#f85149';
+    tr.innerHTML = `
+      <td style="color:var(--muted);white-space:nowrap">${date}</td>
+      <td style="font-weight:500">${d.nombre||'—'}</td>
+      <td style="color:var(--muted)">${d.telefono||'—'}</td>
+      <td style="color:var(--muted)">${d.email||'—'}</td>
+      <td><span class="badge" style="background:rgba(212,168,67,0.1);color:var(--gold)">${CANALES[d.canal]||d.canal||'—'}</span></td>
+      <td class="stars-display">${stars}</td>
+      <td><span style="font-weight:700;color:${npsColor}">${d.nps??'—'}</span></td>
+      <td style="color:${d.primera==='sí'?'var(--green)':'var(--muted)'}">${d.primera==='sí'?'✓ Sí':'No'}</td>
+      <td>${MOTIVOS[d.motivo]||d.motivo||'—'}</td>
+      <td>${d.precio||'—'}</td>
+      <td style="color:var(--muted);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d.mejora||''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Canal bars
+  const canalBars = document.getElementById('canalBars');
+  const max = Math.max(...Object.values(canalCount));
+  canalBars.innerHTML = Object.entries(canalCount).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div class="canal-bar">
+      <div class="canal-name">${CANALES[k]||k}</div>
+      <div class="canal-track"><div class="canal-fill" style="width:${v/max*100}%"></div></div>
+      <div class="canal-count">${v}</div>
+    </div>
+  `).join('');
+
+  // Edad
+  const edadCount={};
+  data.forEach(d=>{ if(d.edad) edadCount[d.edad]=(edadCount[d.edad]||0)+1; });
+  makeChart('chartEdad','bar',{
+    labels:Object.keys(edadCount),
+    datasets:[{label:'Clientes',data:Object.values(edadCount),backgroundColor:'rgba(188,140,255,0.6)',borderColor:'#bc8cff',borderWidth:1,borderRadius:4}]
+  },{plugins:{legend:{display:false}},scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590'}},y:{grid:{color:'#21262d'},ticks:{color:'#7d8590'}}}});
+
+  // Contacto
+  const contactoCount={};
+  data.forEach(d=>{ (d.contacto||[]).forEach(c=>contactoCount[c]=(contactoCount[c]||0)+1); });
+  makeChart('chartContacto','bar',{
+    labels:Object.keys(contactoCount).map(k=>({whatsapp:'WhatsApp',email:'Email',instagram:'Instagram',ninguno:'Sin contacto'}[k]||k)),
+    datasets:[{label:'',data:Object.values(contactoCount),backgroundColor:'rgba(63,185,80,0.5)',borderColor:'#3fb950',borderWidth:1,borderRadius:4}]
+  },{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590'}},y:{grid:{display:false},ticks:{color:'#7d8590'}}}});
+
+  // NPS score & donut
+  document.getElementById('npsScore').textContent = npsScore > 0 ? '+'+npsScore : npsScore;
+  document.getElementById('npsScore').style.color = npsScore >= 50 ? '#3fb950' : npsScore >= 0 ? '#ffa657' : '#f85149';
+
+  const pasivos = npsVals.filter(v=>v>=7&&v<=8).length;
+  document.getElementById('npsBreakdown').innerHTML = `
+    <div class="nps-row"><span style="color:#3fb950;width:90px">Promotores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:${promotores/npsVals.length*100}%;background:#3fb950"></div></div><span style="color:#7d8590;width:30px;text-align:right">${promotores}</span></div>
+    <div class="nps-row"><span style="color:#ffa657;width:90px">Pasivos</span><div class="nps-bar"><div class="nps-bar-fill" style="width:${pasivos/npsVals.length*100}%;background:#ffa657"></div></div><span style="color:#7d8590;width:30px;text-align:right">${pasivos}</span></div>
+    <div class="nps-row"><span style="color:#f85149;width:90px">Detractores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:${detractores/npsVals.length*100}%;background:#f85149"></div></div><span style="color:#7d8590;width:30px;text-align:right">${detractores}</span></div>
+  `;
+
+  const npsDistrib = Array(11).fill(0);
+  npsVals.forEach(v=>npsDistrib[v]++);
+  const npsColors = npsDistrib.map((_,i)=> i<=6?'rgba(248,81,73,0.7)':i<=8?'rgba(255,166,87,0.7)':'rgba(63,185,80,0.7)');
+  makeChart('chartNPS','bar',{
+    labels:[0,1,2,3,4,5,6,7,8,9,10],
+    datasets:[{label:'Respuestas',data:npsDistrib,backgroundColor:npsColors,borderWidth:0,borderRadius:4}]
+  },{plugins:{legend:{display:false}},scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590'}},y:{grid:{color:'#21262d'},ticks:{color:'#7d8590',stepSize:1}}}});
+
+  // Star dims
+  ['comida','servicio','ambiente'].forEach(dim=>{
+    const vals = data.map(d=>d.estrellas?.[dim]||0).filter(v=>v>0);
+    document.getElementById('avg'+dim.charAt(0).toUpperCase()+dim.slice(1)).textContent = vals.length ? avg(vals).toFixed(1) : '—';
+    const dist = [1,2,3,4,5].map(s=>vals.filter(v=>v===s).length);
+    makeChart('chart'+dim.charAt(0).toUpperCase()+dim.slice(1),'bar',{
+      labels:['1★','2★','3★','4★','5★'],
+      datasets:[{data:dist,backgroundColor:'rgba(212,168,67,0.5)',borderColor:GOLD,borderWidth:1,borderRadius:4}]
+    },{plugins:{legend:{display:false}},scales:{x:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{size:10}}},y:{grid:{color:'#21262d'},ticks:{color:'#7d8590',font:{size:10}}}}});
+  });
+}
+
+function switchSection(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  setTimeout(renderAll, 50);
+}
+
+function showTab(id) {
+  if(id==='dashboard'||id==='respuestas'||id==='canales'||id==='nps') switchSection(id);
+}
+
+function exportCSV() {
+  const data = getData();
+  if(!data.length) { alert('No hay datos aún.'); return; }
+  const headers = ['Fecha','Nombre','Teléfono','Email','Edad','Primera_visita','Frecuencia','Grupo','Motivo','Canal','Recomendador','⭐General','⭐Comida','⭐Servicio','⭐Ambiente','Precio','NPS','Lo_que_gustó','Preferencia_contacto','Mejora','Comentario','Cupón'];
+  const rows = data.map(d=>[
+    new Date(d.timestamp).toLocaleDateString('es-CL'),
+    d.nombre,d.telefono,d.email,d.edad,d.primera,d.frecuencia||'',d.grupo,d.motivo,
+    CANALES[d.canal]||d.canal,d.recomendador,
+    d.estrellas?.general,d.estrellas?.comida,d.estrellas?.servicio,d.estrellas?.ambiente,
+    d.precio,d.nps,
+    (d.gusto||[]).join('|'),
+    (d.contacto||[]).join('|'),
+    (d.mejora||'').replace(/,/g,';'),
+    (d.comentario||'').replace(/,/g,';'),
+    d.coupon
+  ].map(v=>`"${v??''}"`).join(','));
+
+  const csv = [headers.join(','),...rows].join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `toscana_encuestas_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+renderAll();
+</script>
+</body>
+</html>

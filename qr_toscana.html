@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toscana · QR Encuesta</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --cream: #faf6ef;
+    --espresso: #2c1810;
+    --cafe: #6b3f2a;
+    --gold: #c9a84c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--cream); display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: 'DM Sans', sans-serif; padding: 20px; }
+
+  .card {
+    background: white;
+    border-radius: 24px;
+    padding: 44px 40px 36px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(44,24,16,0.12);
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--espresso), var(--cafe), var(--gold), var(--cafe), var(--espresso));
+  }
+
+  .ornament { font-size: 20px; color: var(--gold); margin-bottom: 8px; letter-spacing: 4px; }
+
+  .brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 300;
+    letter-spacing: 8px;
+    color: var(--espresso);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: #8c7b6e;
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .qr-wrapper {
+    background: white;
+    border: 2px solid #f0e8d8;
+    border-radius: 16px;
+    padding: 20px;
+    display: inline-block;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  /* Esquinas decorativas */
+  .qr-wrapper::before, .qr-wrapper::after,
+  .qr-wrapper span::before, .qr-wrapper span::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: var(--gold);
+    border-style: solid;
+  }
+  .qr-wrapper::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+  .qr-wrapper::after { top: -2px; right: -2px; border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+  .qr-wrapper span::before { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+  .qr-wrapper span::after { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+  #qrcode canvas, #qrcode img { border-radius: 8px; }
+
+  .coffee-badge {
+    background: linear-gradient(135deg, var(--espresso), var(--cafe));
+    color: white;
+    border-radius: 50px;
+    padding: 10px 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .coffee-badge .icon { font-size: 18px; }
+
+  .cta {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--espresso);
+    margin-bottom: 6px;
+  }
+
+  .sub {
+    font-size: 12px;
+    color: #8c7b6e;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .url-box {
+    background: #f9f5ee;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--cafe);
+    font-family: monospace;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    word-break: break-all;
+  }
+
+  .print-btn {
+    padding: 10px 24px;
+    background: var(--espresso);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 1px;
+    transition: opacity 0.2s;
+  }
+
+  .print-btn:hover { opacity: 0.85; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid #f0e8d8;
+    margin: 20px 0 16px;
+  }
+
+  .footer {
+    font-size: 11px;
+    color: #c4b49e;
+    letter-spacing: 1px;
+  }
+
+  @media print {
+    body { background: white; }
+    .print-btn, .url-box { display: none; }
+    .card { box-shadow: none; border: 1px solid #eee; }
+  }
+
+  /* URL input */
+  .url-input-section {
+    background: #f9f5ee;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .url-input-section label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8c7b6e;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .url-input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .url-input-row input {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd4c4;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--espresso);
+    background: white;
+  }
+
+  .url-input-row input:focus { outline: none; border-color: var(--gold); }
+
+  .url-input-row button {
+    padding: 9px 14px;
+    background: var(--cafe);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="ornament">✦ ✦ ✦</div>
+  <div class="brand">Toscana</div>
+  <div class="tagline">Restaurante</div>
+
+  <!-- Input URL -->
+  <div class="url-input-section">
+    <label>URL de tu encuesta</label>
+    <div class="url-input-row">
+      <input type="text" id="urlInput" placeholder="https://tudominio.com/encuesta_toscana.html" />
+      <button onclick="generateQR()">Generar QR</button>
+    </div>
+    <div style="font-size:11px;color:#aaa;margin-top:6px">Ingresa la URL donde estará alojada tu encuesta</div>
+  </div>
+
+  <div class="coffee-badge">
+    <span class="icon">☕</span>
+    <span>Responde y recibe un café gratis</span>
+  </div>
+
+  <p class="cta">Escanéame y cuéntanos<br>tu experiencia</p>
+
+  <div class="qr-wrapper"><span></span>
+    <div id="qrcode"></div>
+  </div>
+
+  <p class="sub">
+    Comparte tu opinión con nosotros.<br>
+    ¡Solo toma 2 minutos y el café es nuestro regalo!
+  </p>
+
+  <hr class="divider">
+
+  <button class="print-btn" onclick="window.print()">🖨 Imprimir QR</button>
+
+  <hr class="divider">
+  <div class="footer">TOSCANA · ENCUESTA DE SATISFACCIÓN</div>
+</div>
+
+<script>
+  let qrInstance = null;
+
+  function generateQR() {
+    const url = document.getElementById('urlInput').value.trim() || 'encuesta_toscana.html';
+    const container = document.getElementById('qrcode');
+    container.innerHTML = '';
+
+    qrInstance = new QRCode(container, {
+      text: url,
+      width: 220,
+      height: 220,
+      colorDark: '#2c1810',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+  }
+
+  // Generar con URL de ejemplo al cargar
+  window.onload = function() {
+    document.getElementById('urlInput').value = window.location.href.replace('qr_toscana.html','encuesta_toscana.html');
+    generateQR();
+  };
+</script>
+
+</body>
+</html>
