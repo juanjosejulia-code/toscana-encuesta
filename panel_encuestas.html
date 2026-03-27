@@ -72,7 +72,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .comment-card .cf{font-size:11px;color:var(--muted);margin-top:6px;}
 .precio-badge{display:inline-flex;align-items:center;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;margin:3px;}
 .empty-msg{color:var(--muted);font-size:13px;font-style:italic;padding:16px 0;}
-.comments-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:0;}
+.comments-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;padding:16px;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.charts-grid,.charts-grid.wide,.charts-grid.triple,.comments-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -155,7 +155,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     <div class="section" id="sec-experiencia">
       <div class="charts-grid">
         <div class="card">
-          <div class="card-title">&#128200; Lo que más gustó · Preferencias</div>
+          <div class="card-title">&#128200; Lo que más gustó</div>
           <div id="heatmapContainer" style="margin-top:8px"></div>
         </div>
         <div class="card">
@@ -252,7 +252,6 @@ function renderCharts(){
 }
 function renderTable(){
   var tb=document.getElementById('tableBody');tb.innerHTML='';
-  // MAS RECIENTES PRIMERO
   data.slice().reverse().forEach(function(d){
     var nps=parseInt(d.NPS),nc=nps>=9?'#3fb950':nps>=7?'#ffa657':'#f85149',st='⭐'.repeat(parseInt(d['Estrellas General'])||0);
     var tr=document.createElement('tr');
@@ -266,21 +265,21 @@ function renderExperiencia(){
   var hc=document.getElementById('heatmapContainer');
   hc.innerHTML=sorted.length?sorted.map(function(e){var pct=Math.round(e[1]/total*100),w=Math.round(e[1]/maxG*100);return '<div class="heat-row"><div class="heat-label">'+(GUSTO[e[0]]||e[0])+'</div><div class="heat-bar-wrap"><div class="heat-bar" style="width:'+w+'%"></div><span class="heat-pct">'+pct+'%</span></div><div class="heat-count">'+e[1]+'</div></div>';}).join(''):'<div class="empty-msg">Sin datos aún</div>';
   var pc2=cnt(data,'Precio'),pcC={excelente:'#3fb950',buena:'#58a6ff',regular:'#ffa657',cara:'#f85149'},pm2={excelente:'Excelente',buena:'Buena',regular:'Regular',cara:'Cara'};
-  if(ch['chartPrecioExp'])ch['chartPrecioExp'].destroy();
+  if(ch.chartPrecioExp)ch.chartPrecioExp.destroy();
   var ctx2=document.getElementById('chartPrecioExp');
-  if(ctx2&&Object.keys(pc2).length)ch['chartPrecioExp']=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pc2).map(function(k){return pm2[k]||k;}),datasets:[{data:Object.values(pc2),backgroundColor:Object.keys(pc2).map(function(k){return pcC[k]||'#7d8590';}),borderWidth:2,borderColor:'#161b22'}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:14}}}}});
+  if(ctx2&&Object.keys(pc2).length)ch.chartPrecioExp=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pc2).map(function(k){return pm2[k]||k;}),datasets:[{data:Object.values(pc2),backgroundColor:Object.keys(pc2).map(function(k){return pcC[k]||'#7d8590';}),borderWidth:2,borderColor:'#161b22'}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:14}}}}});
   var tot2=data.length,pos=(pc2.excelente||0)+(pc2.buena||0),pctPos=tot2?Math.round(pos/tot2*100):0;
   document.getElementById('precioSummary').innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+(pc2.excelente?'<span class="precio-badge" style="background:rgba(63,185,80,0.15);color:#3fb950">Excelente: '+pc2.excelente+'</span>':'')+(pc2.buena?'<span class="precio-badge" style="background:rgba(88,166,255,0.15);color:#58a6ff">Buena: '+pc2.buena+'</span>':'')+(pc2.regular?'<span class="precio-badge" style="background:rgba(255,166,87,0.15);color:#ffa657">Regular: '+pc2.regular+'</span>':'')+(pc2.cara?'<span class="precio-badge" style="background:rgba(248,81,73,0.15);color:#f85149">Cara: '+pc2.cara+'</span>':'')+'<span class="precio-badge" style="background:rgba(63,185,80,0.1);color:#3fb950">✔ '+pctPos+'% positiva</span></div>';
 }
 function renderComentarios(){
-  // COLUMNA T: Mejora — MAS RECIENTES PRIMERO
+  // COLUMNA T: Mejora — mas recientes primero
   var mj=data.slice().reverse().filter(function(d){return d.Mejora&&d.Mejora.trim();});
   document.getElementById('cntMejoras').textContent='('+mj.length+')';
-  document.getElementById('listaMejoras').innerHTML=mj.length?mj.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+(MOT[d.Motivo]||d.Motivo||'')+(d.NPS?' · NPS: '+d.NPS:'')+'</div></div>';}).join(''):'<div class="empty-msg">No hay sugerencias aún — ¡todo perfecto!</div>';
-  // COLUMNA U: comentario al equipo — MAS RECIENTES PRIMERO
+  document.getElementById('listaMejoras').innerHTML=mj.length?mj.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+(MOT[d.Motivo]||d.Motivo||'')+(d.NPS?' · NPS: '+d.NPS:'')+'</div></div>';}).join(''):'<div class="empty-msg">No hay sugerencias aún — ¡todo perfecto!</div>';
+  // COLUMNA U: comentario al equipo — mas recientes primero
   var cm3=data.slice().reverse().filter(function(d){return d['comentario al equipo']&&d['comentario al equipo'].trim();});
   document.getElementById('cntComentarios').textContent='('+cm3.length+')';
-  document.getElementById('listaComentarios').innerHTML=cm3.length?cm3.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d['comentario al equipo']+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d['Estrellas General']+'</div></div>';}).join(''):'<div class="empty-msg">No hay comentarios al equipo aún</div>';
+  document.getElementById('listaComentarios').innerHTML=cm3.length?cm3.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d['comentario al equipo']+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d['Estrellas General']+'</div></div>';}).join(''):'<div class="empty-msg">No hay comentarios al equipo aún</div>';
 }
 function switchTab(id){
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
