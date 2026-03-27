@@ -3,11 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- v4-col-u-fix -->
 <title>Fuente Toscana · Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0d1117;--surface:#161b22;--border:#21262d;--text:#e6edf3;--muted:#7d8590;--terra:#C4572A;--terra-dim:#8a3d1e;--green:#3fb950;--red:#f85149;--blue:#58a6ff;}
+:root{--bg:#0d1117;--surface:#161b22;--border:#21262d;--text:#e6edf3;--muted:#7d8590;--terra:#C4572A;--terra-dim:#8a3d1e;--green:#3fb950;--blue:#58a6ff;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
 .layout{display:flex;min-height:100vh;}
@@ -55,7 +56,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .canal-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
 .canal-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--terra-dim),var(--terra));}
 .canal-count{width:28px;text-align:right;color:var(--muted);}
-.loading{text-align:center;padding:60px;color:var(--muted);font-size:14px;}
+.loading{text-align:center;padding:60px;color:var(--muted);}
 .spin{display:inline-block;font-size:32px;animation:spin 1s linear infinite;margin-bottom:12px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .error-banner{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#f85149;display:none;}
@@ -74,9 +75,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 .empty-msg{color:var(--muted);font-size:13px;font-style:italic;padding:16px 0;}
 .comments-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;padding:16px;}.kpi-grid{grid-template-columns:repeat(2,1fr);}.charts-grid,.charts-grid.wide,.charts-grid.triple,.comments-grid{grid-template-columns:1fr;}}
-</style>
-</head>
-<body>
+</style></head><body>
 <div class="layout">
 <aside class="sidebar">
   <div class="sidebar-brand">
@@ -97,7 +96,7 @@ tr:hover td{background:rgba(255,255,255,0.02);}
 </aside>
 <main class="main">
   <div class="page-header">
-    <div><h1>Panel de Encuestas</h1><div class="sub" id="subtitleCount">Cargando datos reales...</div></div>
+    <div><h1>Panel de Encuestas</h1><div class="sub" id="subtitleCount">Cargando...</div></div>
     <button class="refresh-btn" onclick="loadData()">&#8635; Actualizar</button>
   </div>
   <div class="error-banner" id="errorBanner"></div>
@@ -118,34 +117,20 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       <div class="tab" id="tab-experiencia" onclick="switchTab('experiencia')">Experiencia</div>
       <div class="tab" id="tab-comentarios" onclick="switchTab('comentarios')">Comentarios</div>
     </div>    <div class="section active" id="sec-dashboard">
-      <div class="charts-grid wide">
-        <div class="card"><div class="card-title">Respuestas por día</div><canvas id="chartTimeline" height="100"></canvas></div>
-        <div class="card"><div class="card-title">Canal de llegada</div><canvas id="chartCanal" height="160"></canvas></div>
-      </div>
-      <div class="charts-grid triple">
-        <div class="card"><div class="card-title">Motivo de visita</div><canvas id="chartMotivo" height="170"></canvas></div>
-        <div class="card"><div class="card-title">Tamaño de grupo</div><canvas id="chartGrupo" height="170"></canvas></div>
-        <div class="card"><div class="card-title">Precio–calidad</div><canvas id="chartPrecio" height="170"></canvas></div>
-      </div>
+      <div class="charts-grid wide"><div class="card"><div class="card-title">Respuestas por día</div><canvas id="chartTimeline" height="100"></canvas></div><div class="card"><div class="card-title">Canal de llegada</div><canvas id="chartCanal" height="160"></canvas></div></div>
+      <div class="charts-grid triple"><div class="card"><div class="card-title">Motivo de visita</div><canvas id="chartMotivo" height="170"></canvas></div><div class="card"><div class="card-title">Tamaño de grupo</div><canvas id="chartGrupo" height="170"></canvas></div><div class="card"><div class="card-title">Precio–calidad</div><canvas id="chartPrecio" height="170"></canvas></div></div>
     </div>
     <div class="section" id="sec-respuestas">
-      <div class="card">
-        <div class="card-title">Respuestas · <span id="respCount" style="color:var(--terra)"></span></div>
-        <div class="table-wrapper"><table><thead><tr><th>Fecha</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Canal</th><th>⭐</th><th>NPS</th><th>Primera?</th><th>Motivo</th><th>Mejora</th></tr></thead><tbody id="tableBody"></tbody></table></div>
+      <div class="card"><div class="card-title">Respuestas · <span id="respCount" style="color:var(--terra)"></span></div>
+        <div class="table-wrapper"><table><thead><tr><th>Fecha</th><th>Nombre</th><th>Teléfono</th><th>Canal</th><th>⭐</th><th>NPS</th><th>Primera?</th><th>Motivo</th><th>Mejora</th></tr></thead><tbody id="tableBody"></tbody></table></div>
       </div>
     </div>
     <div class="section" id="sec-canales">
-      <div class="charts-grid">
-        <div class="card"><div class="card-title">¿Cómo llegaron?</div><div id="canalBars"></div></div>
-        <div class="card"><div class="card-title">Edad</div><canvas id="chartEdad" height="200"></canvas></div>
-      </div>
+      <div class="charts-grid"><div class="card"><div class="card-title">¿Cómo llegaron?</div><div id="canalBars"></div></div><div class="card"><div class="card-title">Edad</div><canvas id="chartEdad" height="200"></canvas></div></div>
       <div class="card" style="margin-top:14px"><div class="card-title">Preferencia de contacto</div><canvas id="chartContacto" height="80"></canvas></div>
     </div>
     <div class="section" id="sec-nps">
-      <div class="charts-grid">
-        <div class="card"><div class="card-title">NPS Score</div><div class="nps-display"><div><div class="nps-big" id="npsScore">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Net Promoter Score</div></div><div style="flex:1" id="npsBreakdown"></div></div></div>
-        <div class="card"><div class="card-title">Distribución NPS</div><canvas id="chartNPS" height="160"></canvas></div>
-      </div>
+      <div class="charts-grid"><div class="card"><div class="card-title">NPS Score</div><div class="nps-display"><div><div class="nps-big" id="npsScore">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Net Promoter Score</div></div><div style="flex:1" id="npsBreakdown"></div></div></div><div class="card"><div class="card-title">Distribución NPS</div><canvas id="chartNPS" height="160"></canvas></div></div>
       <div class="charts-grid triple" style="margin-top:14px">
         <div class="card"><div class="card-title">⭐ Comida</div><div style="font-size:48px;font-weight:700;color:var(--terra);text-align:center;padding:12px 0" id="avgComida">—</div><canvas id="chartComida" height="80"></canvas></div>
         <div class="card"><div class="card-title">⭐ Servicio</div><div style="font-size:48px;font-weight:700;color:var(--terra);text-align:center;padding:12px 0" id="avgServicio">—</div><canvas id="chartServicio" height="80"></canvas></div>
@@ -154,15 +139,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
     </div>
     <div class="section" id="sec-experiencia">
       <div class="charts-grid">
-        <div class="card">
-          <div class="card-title">&#128200; Lo que más gustó</div>
-          <div id="heatmapContainer" style="margin-top:8px"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">&#127968; Percepción precio–calidad</div>
-          <canvas id="chartPrecioExp" height="200"></canvas>
-          <div id="precioSummary" style="margin-top:14px"></div>
-        </div>
+        <div class="card"><div class="card-title">&#128200; Lo que más gustó</div><div id="heatmapContainer" style="margin-top:8px"></div></div>
+        <div class="card"><div class="card-title">&#127968; Percepción precio–calidad</div><canvas id="chartPrecioExp" height="200"></canvas><div id="precioSummary" style="margin-top:14px"></div></div>
       </div>
     </div>
     <div class="section" id="sec-comentarios">
@@ -178,10 +156,8 @@ tr:hover td{background:rgba(255,255,255,0.02);}
       </div>
     </div>
   </div>
-</main>
-</div><script>
-const SHEET_ID='1-v-wXsXh6-SLBXwRrAgJ_R4ColaBod7UwpX04kQCaTE';
-const CSV='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/export?format=csv&gid=0';
+</main></div><script>
+const SHEET='https://docs.google.com/spreadsheets/d/1-v-wXsXh6-SLBXwRrAgJ_R4ColaBod7UwpX04kQCaTE/export?format=csv&gid=0';
 const CAN={instagram:'Instagram/FB',google:'Google/Maps',recomendacion:'Recomendación',pasaba:'Pasaba por aquí',prensa:'Prensa',ya_conocia:'Ya conocía'};
 const MOT={almuerzo_trabajo:'Trabajo',reunion_amigos:'Amigos',cita_pareja:'Pareja',familiar:'Familia',celebracion:'Celebración',casual:'Casual'};
 const GUSTO={comida:'La comida',servicio:'El servicio',ambiente:'El ambiente',precio:'Los precios',ubicacion:'La ubicación',carta:'Variedad de carta'};
@@ -190,7 +166,7 @@ function parseCSV(txt){
   var lines=[],line='',inQ=false;
   for(var i=0;i<txt.length;i++){var c=txt[i];if(c=='"'){inQ=!inQ;}else if(c=='
 '&&!inQ){lines.push(line);line='';continue;}else if(c=='
-'){continue;}line+=c;}
+')continue;line+=c;}
   if(line.trim())lines.push(line);
   function pF(s){var f=[],cur='',inQ=false;for(var i=0;i<s.length;i++){var c=s[i];if(c=='"'){if(inQ&&s[i+1]=='"'){cur+='"';i++;}else inQ=!inQ;}else if(c==','&&!inQ){f.push(cur.trim());cur='';}else cur+=c;}f.push(cur.trim());return f;}
   var h=pF(lines[0]),r=[];
@@ -202,7 +178,7 @@ async function loadData(){
   document.getElementById('mainContent').style.display='none';
   document.getElementById('errorBanner').style.display='none';
   try{
-    var r=await fetch(CSV+'&t='+Date.now());if(!r.ok)throw new Error('Error '+r.status);
+    var r=await fetch(SHEET+'&t='+Date.now());if(!r.ok)throw new Error('Error '+r.status);
     data=parseCSV(await r.text());
     document.getElementById('loadingView').style.display='none';
     document.getElementById('mainContent').style.display='block';
@@ -210,12 +186,7 @@ async function loadData(){
     document.getElementById('subtitleCount').textContent=data.length+' respuestas reales · Fuente Toscana';
     document.getElementById('respCount').textContent=data.length;
     kpis();renderCharts();renderTable();renderExperiencia();renderComentarios();
-  }catch(e){
-    document.getElementById('loadingView').style.display='none';
-    document.getElementById('mainContent').style.display='block';
-    var b=document.getElementById('errorBanner');b.style.display='block';
-    b.textContent='⚠️ '+e.message;
-  }
+  }catch(e){document.getElementById('loadingView').style.display='none';document.getElementById('mainContent').style.display='block';var b=document.getElementById('errorBanner');b.style.display='block';b.textContent='⚠️ '+e.message;}
 }
 function avg(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:0;}
 function cnt(a,k,m){var c={};a.forEach(function(d){var v=d[k];if(v)c[v]=(c[v]||0)+1;});if(m){var rr={};Object.entries(c).forEach(function(e){rr[m[e[0]]||e[0]]=e[1];});return rr;}return c;}
@@ -243,8 +214,7 @@ function renderCharts(){
   var pc=cnt(data,'Precio'),pm={excelente:'Excelente',buena:'Buena',regular:'Regular',cara:'Cara'};mk('chartPrecio','doughnut',{labels:Object.keys(pc).map(function(k){return pm[k]||k;}),datasets:[{data:Object.values(pc),backgroundColor:['#3fb950','#58a6ff','#ffa657','#f85149'],borderWidth:0}]});
   mk('chartEdad','bar',{labels:Object.keys(cnt(data,'Edad')),datasets:[{label:'',data:Object.values(cnt(data,'Edad')),backgroundColor:'rgba(188,140,255,0.6)',borderColor:'#bc8cff',borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});
   var co={};data.forEach(function(d){(d.Contacto||'').split(',').forEach(function(c){c=c.trim();if(c)co[c]=(co[c]||0)+1;});});
-  var cm2={whatsapp:'WhatsApp',email:'Email',instagram:'Instagram',ninguno:'Sin contacto'};
-  mk('chartContacto','bar',{labels:Object.keys(co).map(function(k){return cm2[k]||k;}),datasets:[{label:'',data:Object.values(co),backgroundColor:'rgba(63,185,80,0.5)',borderColor:'#3fb950',borderWidth:1,borderRadius:4}]},{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:'#7d8590'}}}});
+  var cm2={whatsapp:'WhatsApp',email:'Email',instagram:'Instagram',ninguno:'Sin contacto'};mk('chartContacto','bar',{labels:Object.keys(co).map(function(k){return cm2[k]||k;}),datasets:[{label:'',data:Object.values(co),backgroundColor:'rgba(63,185,80,0.5)',borderColor:'#3fb950',borderWidth:1,borderRadius:4}]},{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:'#7d8590'}}}});
   var nd=Array(11).fill(0);data.forEach(function(d){var v=parseInt(d.NPS);if(!isNaN(v)&&v>=0&&v<=10)nd[v]++;});
   mk('chartNPS','bar',{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{label:'',data:nd,backgroundColor:nd.map(function(_,i){return i<=6?'rgba(248,81,73,0.7)':i<=8?'rgba(255,166,87,0.7)':'rgba(63,185,80,0.7)';}),borderWidth:0,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});
   ['Comida','Servicio','Ambiente'].forEach(function(d){var v=data.map(function(x){return parseFloat(x['Estrellas '+d]);}).filter(function(x){return !isNaN(x)&&x>=1&&x<=5;});document.getElementById('avg'+d).textContent=v.length?avg(v).toFixed(1):'—';mk('chart'+d,'bar',{labels:['1★','2★','3★','4★','5★'],datasets:[{data:[1,2,3,4,5].map(function(s){return v.filter(function(x){return x===s;}).length;}),backgroundColor:'rgba(196,87,42,0.5)',borderColor:T,borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});});
@@ -252,34 +222,28 @@ function renderCharts(){
 }
 function renderTable(){
   var tb=document.getElementById('tableBody');tb.innerHTML='';
-  data.slice().reverse().forEach(function(d){
-    var nps=parseInt(d.NPS),nc=nps>=9?'#3fb950':nps>=7?'#ffa657':'#f85149',st='⭐'.repeat(parseInt(d['Estrellas General'])||0);
-    var tr=document.createElement('tr');
-    tr.innerHTML='<td style="color:var(--muted);white-space:nowrap">'+(d.Fecha||'').substring(0,16)+'</td><td style="font-weight:500">'+(d.Nombre||'—')+'</td><td style="color:var(--muted)">'+(d.Telefono||'—')+'</td><td style="color:var(--muted);font-size:11px">'+(d.Email||'—')+'</td><td><span class="badge" style="background:rgba(196,87,42,0.1);color:var(--terra)">'+(CAN[d.Canal]||d.Canal||'—')+'</span></td><td style="color:var(--terra)">'+st+'</td><td><span style="font-weight:700;color:'+nc+'">'+(isNaN(nps)?'—':nps)+'</span></td><td style="color:'+(d['Primera visita']==='sí'?'var(--green)':'var(--muted)')+'">'+( d['Primera visita']==='sí'?'✓ Sí':'No')+'</td><td>'+(MOT[d.Motivo]||d.Motivo||'—')+'</td><td style="color:var(--muted);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(d.Mejora||'')+'</td>';
-    tb.appendChild(tr);
-  });
+  data.slice().reverse().forEach(function(d){var nps=parseInt(d.NPS),nc=nps>=9?'#3fb950':nps>=7?'#ffa657':'#f85149',st='⭐'.repeat(parseInt(d['Estrellas General'])||0);var tr=document.createElement('tr');tr.innerHTML='<td style="color:var(--muted);white-space:nowrap">'+(d.Fecha||'').substring(0,16)+'</td><td style="font-weight:500">'+(d.Nombre||'—')+'</td><td style="color:var(--muted)">'+(d.Telefono||'—')+'</td><td><span class="badge" style="background:rgba(196,87,42,0.1);color:var(--terra)">'+(CAN[d.Canal]||d.Canal||'—')+'</span></td><td style="color:var(--terra)">'+st+'</td><td><span style="font-weight:700;color:'+nc+'">'+(isNaN(nps)?'—':nps)+'</span></td><td style="color:'+(d['Primera visita']==='sí'?'var(--green)':'var(--muted)')+'">'+( d['Primera visita']==='sí'?'✓ Sí':'No')+'</td><td>'+(MOT[d.Motivo]||d.Motivo||'—')+'</td><td style="color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(d.Mejora||'')+'</td>';tb.appendChild(tr);});
 }
 function renderExperiencia(){
   var gc={};data.forEach(function(d){(d['Lo que gusto']||'').split(',').forEach(function(v){v=v.trim();if(v)gc[v]=(gc[v]||0)+1;});});
   var total=data.length||1,sorted=Object.entries(gc).sort(function(a,b){return b[1]-a[1];}),maxG=sorted.length?sorted[0][1]:1;
-  var hc=document.getElementById('heatmapContainer');
-  hc.innerHTML=sorted.length?sorted.map(function(e){var pct=Math.round(e[1]/total*100),w=Math.round(e[1]/maxG*100);return '<div class="heat-row"><div class="heat-label">'+(GUSTO[e[0]]||e[0])+'</div><div class="heat-bar-wrap"><div class="heat-bar" style="width:'+w+'%"></div><span class="heat-pct">'+pct+'%</span></div><div class="heat-count">'+e[1]+'</div></div>';}).join(''):'<div class="empty-msg">Sin datos aún</div>';
+  document.getElementById('heatmapContainer').innerHTML=sorted.length?sorted.map(function(e){var pct=Math.round(e[1]/total*100),w=Math.round(e[1]/maxG*100);return '<div class="heat-row"><div class="heat-label">'+(GUSTO[e[0]]||e[0])+'</div><div class="heat-bar-wrap"><div class="heat-bar" style="width:'+w+'%"></div><span class="heat-pct">'+pct+'%</span></div><div class="heat-count">'+e[1]+'</div></div>';}).join(''):'<div class="empty-msg">Sin datos aún</div>';
   var pc2=cnt(data,'Precio'),pcC={excelente:'#3fb950',buena:'#58a6ff',regular:'#ffa657',cara:'#f85149'},pm2={excelente:'Excelente',buena:'Buena',regular:'Regular',cara:'Cara'};
   if(ch.chartPrecioExp)ch.chartPrecioExp.destroy();
   var ctx2=document.getElementById('chartPrecioExp');
   if(ctx2&&Object.keys(pc2).length)ch.chartPrecioExp=new Chart(ctx2,{type:'doughnut',data:{labels:Object.keys(pc2).map(function(k){return pm2[k]||k;}),datasets:[{data:Object.values(pc2),backgroundColor:Object.keys(pc2).map(function(k){return pcC[k]||'#7d8590';}),borderWidth:2,borderColor:'#161b22'}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#7d8590',font:{size:11},boxWidth:14}}}}});
-  var tot2=data.length,pos=(pc2.excelente||0)+(pc2.buena||0),pctPos=tot2?Math.round(pos/tot2*100):0;
+  var pos=(pc2.excelente||0)+(pc2.buena||0),pctPos=data.length?Math.round(pos/data.length*100):0;
   document.getElementById('precioSummary').innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+(pc2.excelente?'<span class="precio-badge" style="background:rgba(63,185,80,0.15);color:#3fb950">Excelente: '+pc2.excelente+'</span>':'')+(pc2.buena?'<span class="precio-badge" style="background:rgba(88,166,255,0.15);color:#58a6ff">Buena: '+pc2.buena+'</span>':'')+(pc2.regular?'<span class="precio-badge" style="background:rgba(255,166,87,0.15);color:#ffa657">Regular: '+pc2.regular+'</span>':'')+(pc2.cara?'<span class="precio-badge" style="background:rgba(248,81,73,0.15);color:#f85149">Cara: '+pc2.cara+'</span>':'')+'<span class="precio-badge" style="background:rgba(63,185,80,0.1);color:#3fb950">✔ '+pctPos+'% positiva</span></div>';
 }
 function renderComentarios(){
-  // COLUMNA T: Mejora — mas recientes primero
+  // COL T: Mejora — mas recientes primero
   var mj=data.slice().reverse().filter(function(d){return d.Mejora&&d.Mejora.trim();});
   document.getElementById('cntMejoras').textContent='('+mj.length+')';
-  document.getElementById('listaMejoras').innerHTML=mj.length?mj.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+(MOT[d.Motivo]||d.Motivo||'')+(d.NPS?' · NPS: '+d.NPS:'')+'</div></div>';}).join(''):'<div class="empty-msg">No hay sugerencias aún — ¡todo perfecto!</div>';
-  // COLUMNA U: comentario al equipo — mas recientes primero
-  var cm3=data.slice().reverse().filter(function(d){return d['comentario al equipo']&&d['comentario al equipo'].trim();});
-  document.getElementById('cntComentarios').textContent='('+cm3.length+')';
-  document.getElementById('listaComentarios').innerHTML=cm3.length?cm3.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d['comentario al equipo']+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d['Estrellas General']+'</div></div>';}).join(''):'<div class="empty-msg">No hay comentarios al equipo aún</div>';
+  document.getElementById('listaMejoras').innerHTML=mj.length?mj.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+(MOT[d.Motivo]||d.Motivo||'')+(d.NPS?' · NPS '+d.NPS:'')+'</div></div>';}).join(''):'<div class="empty-msg">Sin sugerencias aún — ¡todo perfecto!</div>';
+  // COL U: comentario al equipo — mas recientes primero
+  var ce=data.slice().reverse().filter(function(d){return d['comentario al equipo']&&d['comentario al equipo'].trim();});
+  document.getElementById('cntComentarios').textContent='('+ce.length+')';
+  document.getElementById('listaComentarios').innerHTML=ce.length?ce.map(function(d){return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+d.Fecha.substring(0,10)+'</span></div><div class="cd">“'+d['comentario al equipo']+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d['Estrellas General']+'</div></div>';}).join(''):'<div class="empty-msg">Sin comentarios al equipo aún</div>';
 }
 function switchTab(id){
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
@@ -293,6 +257,4 @@ function switchTab(id){
 }
 loadData();
 setInterval(loadData,120000);
-</script>
-</body>
-</html>
+</script></body></html>
