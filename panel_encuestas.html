@@ -28,7 +28,7 @@ table{width:100%;border-collapse:collapse;font-size:12px;}th{padding:9px 12px;te
 .nps-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}.nps-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}.nps-bar-fill{height:100%;border-radius:3px;}
 .canal-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px;}.canal-name{width:130px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .canal-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}.canal-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--terra-dim),var(--terra));}.canal-count{width:28px;text-align:right;color:var(--muted);}
-.loading{text-align:center;padding:60px;color:var(--muted);}.spin{display:inline-block;font-size:32px;animation:spin 1s linear infinite;}@keyframes spin{to{transform:rotate(360deg);}}
+.loading{text-align:center;padding:60px;color:var(--muted);}.spin{display:inline-block;font-size:32px;animation:spin 1s linear infinite;margin-bottom:12px;}@keyframes spin{to{transform:rotate(360deg);}}
 .error-banner{background:rgba(248,81,73,0.1);border:1px solid rgba(248,81,73,0.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#f85149;display:none;}.last-update{font-size:11px;color:var(--muted);margin-top:4px;}
 .heat-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}.heat-label{width:130px;font-size:12px;color:var(--text);}
 .heat-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:24px;overflow:hidden;position:relative;}.heat-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--terra-dim),var(--terra));}.heat-count{width:28px;text-align:right;font-size:12px;color:var(--muted);}.heat-pct{position:absolute;right:8px;top:4px;font-size:11px;color:white;font-weight:700;}
@@ -67,7 +67,8 @@ table{width:100%;border-collapse:collapse;font-size:12px;}th{padding:9px 12px;te
       <div class="tab" id="tab-nps" onclick="switchTab('nps')">Satisfacción</div>
       <div class="tab" id="tab-experiencia" onclick="switchTab('experiencia')">Experiencia</div>
       <div class="tab" id="tab-comentarios" onclick="switchTab('comentarios')">Comentarios</div>
-    </div>    <div class="section active" id="sec-dashboard">
+    </div>
+    <div class="section active" id="sec-dashboard">
       <div class="charts-grid wide"><div class="card"><div class="card-title">Respuestas por día</div><canvas id="chartTimeline" height="100"></canvas></div><div class="card"><div class="card-title">Canal de llegada</div><canvas id="chartCanal" height="160"></canvas></div></div>
       <div class="charts-grid triple"><div class="card"><div class="card-title">Motivo de visita</div><canvas id="chartMotivo" height="170"></canvas></div><div class="card"><div class="card-title">Tamaño de grupo</div><canvas id="chartGrupo" height="170"></canvas></div><div class="card"><div class="card-title">Precio–calidad</div><canvas id="chartPrecio" height="170"></canvas></div></div>
     </div>
@@ -85,7 +86,8 @@ table{width:100%;border-collapse:collapse;font-size:12px;}th{padding:9px 12px;te
       </div>
     </div>
   </div>
-</main></div><script>
+</main></div>
+<script>
 const SHEET="https://docs.google.com/spreadsheets/d/1-v-wXsXh6-SLBXwRrAgJ_R4ColaBod7UwpX04kQCaTE/export?format=csv&gid=0";
 const CAN={instagram:"Instagram/FB",google:"Google/Maps",recomendacion:"Recomendación",pasaba:"Pasaba por aquí",prensa:"Prensa",ya_conocia:"Ya conocía"};
 const MOT={almuerzo_trabajo:"Trabajo",reunion_amigos:"Amigos",cita_pareja:"Pareja",familiar:"Familia",celebracion:"Celebración",casual:"Casual"};
@@ -96,133 +98,36 @@ function parseCSV(txt){
   for(var i=0;i<txt.length;i++){
     var c=txt[i];
     if(c==='"'){inQ=!inQ;}
-    else if(c==="
-"&&!inQ){lines.push(line);line="";continue;}
-    else if(c==="
-")continue;
+    else if(c==="\n"&&!inQ){lines.push(line);line="";continue;}
+    else if(c==="\r")continue;
     line+=c;
   }
   if(line.trim())lines.push(line);
-  function pF(s){
-    var f=[],cur="",inQ=false;
-    for(var i=0;i<s.length;i++){
-      var c=s[i];
-      if(c==='"'){if(inQ&&s[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
-      else if(c===","&&!inQ){f.push(cur.trim());cur="";}
-      else cur+=c;
-    }
-    f.push(cur.trim());return f;
-  }
+  function pF(s){var f=[],cur="",inQ=false;for(var i=0;i<s.length;i++){var c=s[i];if(c==='"'){if(inQ&&s[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}else if(c===","&&!inQ){f.push(cur.trim());cur="";}else cur+=c;}f.push(cur.trim());return f;}
   var h=pF(lines[0]),r=[];
-  for(var i=1;i<lines.length;i++){
-    if(!lines[i].trim())continue;
-    var v=pF(lines[i]),o={};
-    h.forEach(function(k,j){o[k]=(v[j]||"").replace(/^"|"$/g,"").trim();});
-    if(o.Nombre&&o.Nombre!="PRUEBA SISTEMA")r.push(o);
-  }
+  for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var v=pF(lines[i]),o={};h.forEach(function(k,j){o[k]=(v[j]||"").replace(/^"|"$/g,"").trim();});if(o.Nombre&&o.Nombre!="PRUEBA SISTEMA")r.push(o);}
   return r;
 }
-async function loadData(){
-  document.getElementById("loadingView").style.display="block";
-  document.getElementById("mainContent").style.display="none";
-  document.getElementById("errorBanner").style.display="none";
-  try{
-    var resp=await fetch(SHEET+"&t="+Date.now());
-    if(!resp.ok)throw new Error("Error "+resp.status);
-    data=parseCSV(await resp.text());
-    document.getElementById("loadingView").style.display="none";
-    document.getElementById("mainContent").style.display="block";
-    document.getElementById("lastUpdate").textContent="Actualizado "+new Date().toLocaleTimeString("es-CL");
-    document.getElementById("subtitleCount").textContent=data.length+" respuestas reales · Fuente Toscana";
-    document.getElementById("respCount").textContent=data.length;
-    kpis();renderCharts();renderTable();renderExperiencia();renderComentarios();
-  }catch(e){
-    document.getElementById("loadingView").style.display="none";
-    document.getElementById("mainContent").style.display="block";
-    var b=document.getElementById("errorBanner");b.style.display="block";b.textContent="⚠️ "+e.message;
-  }
-}
+async function loadData(){document.getElementById("loadingView").style.display="block";document.getElementById("mainContent").style.display="none";document.getElementById("errorBanner").style.display="none";try{var resp=await fetch(SHEET+"&t="+Date.now());if(!resp.ok)throw new Error("Error "+resp.status);data=parseCSV(await resp.text());document.getElementById("loadingView").style.display="none";document.getElementById("mainContent").style.display="block";document.getElementById("lastUpdate").textContent="Actualizado "+new Date().toLocaleTimeString("es-CL");document.getElementById("subtitleCount").textContent=data.length+" respuestas reales · Fuente Toscana";document.getElementById("respCount").textContent=data.length;kpis();renderCharts();renderTable();renderExperiencia();renderComentarios();}catch(e){document.getElementById("loadingView").style.display="none";document.getElementById("mainContent").style.display="block";var b=document.getElementById("errorBanner");b.style.display="block";b.textContent="⚠️ "+e.message;}}
 function avg(a){return a.length?a.reduce(function(x,y){return x+y;},0)/a.length:0;}
 function cnt(a,k,m){var c={};a.forEach(function(d){var v=d[k];if(v)c[v]=(c[v]||0)+1;});if(m){var rr={};Object.entries(c).forEach(function(e){rr[m[e[0]]||e[0]]=e[1];});return rr;}return c;}
-function kpis(){
-  var n=data.length;document.getElementById("kpi-total").textContent=n;
-  var nv=data.map(function(d){return parseInt(d.NPS);}).filter(function(v){return !isNaN(v)&&v>=0&&v<=10;});
-  document.getElementById("kpi-nps").textContent=nv.length?avg(nv).toFixed(1):"—";
-  var sv=data.map(function(d){return parseFloat(d["Estrellas General"]);}).filter(function(v){return !isNaN(v)&&v>=1&&v<=5;});
-  document.getElementById("kpi-stars").textContent=sv.length?avg(sv).toFixed(1)+" ⭐":"—";
-  var pr=nv.filter(function(v){return v>=9;}).length,dt=nv.filter(function(v){return v<=6;}).length,pa=nv.filter(function(v){return v>=7&&v<=8;}).length;
-  document.getElementById("kpi-promotores").textContent=nv.length?Math.round(pr/nv.length*100)+"%":"0%";
-  document.getElementById("kpi-nuevos").textContent=n?Math.round(data.filter(function(d){return d["Primera visita"]==="sí";}).length/n*100)+"%":"0%";
-  var sc=nv.length?Math.round((pr-dt)/nv.length*100):null;
-  var el=document.getElementById("npsScore");el.textContent=sc!==null?(sc>0?"+":"")+sc:"—";el.style.color=sc>=50?"#3fb950":sc>=0?"#ffa657":"#f85149";
-  document.getElementById("npsBreakdown").innerHTML='<div class="nps-row"><span style="color:#3fb950;width:90px">Promotores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?pr/nv.length*100:0)+'%;background:#3fb950"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+pr+'</span></div><div class="nps-row"><span style="color:#ffa657;width:90px">Pasivos</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?pa/nv.length*100:0)+'%;background:#ffa657"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+pa+'</span></div><div class="nps-row"><span style="color:#f85149;width:90px">Detractores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?dt/nv.length*100:0)+'%;background:#f85149"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+dt+'</span></div>';
-}
+function kpis(){var n=data.length;document.getElementById("kpi-total").textContent=n;var nv=data.map(function(d){return parseInt(d.NPS);}).filter(function(v){return !isNaN(v)&&v>=0&&v<=10;});document.getElementById("kpi-nps").textContent=nv.length?avg(nv).toFixed(1):"—";var sv=data.map(function(d){return parseFloat(d["Estrellas General"]);}).filter(function(v){return !isNaN(v)&&v>=1&&v<=5;});document.getElementById("kpi-stars").textContent=sv.length?avg(sv).toFixed(1)+" ⭐":"—";var pr=nv.filter(function(v){return v>=9;}).length,dt=nv.filter(function(v){return v<=6;}).length,pa=nv.filter(function(v){return v>=7&&v<=8;}).length;document.getElementById("kpi-promotores").textContent=nv.length?Math.round(pr/nv.length*100)+"%":"0%";document.getElementById("kpi-nuevos").textContent=n?Math.round(data.filter(function(d){return d["Primera visita"]==="sí";}).length/n*100)+"%":"0%";var sc=nv.length?Math.round((pr-dt)/nv.length*100):null;var el=document.getElementById("npsScore");el.textContent=sc!==null?(sc>0?"+":"")+sc:"—";el.style.color=sc>=50?"#3fb950":sc>=0?"#ffa657":"#f85149";document.getElementById("npsBreakdown").innerHTML='<div class="nps-row"><span style="color:#3fb950;width:90px">Promotores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?pr/nv.length*100:0)+'%;background:#3fb950"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+pr+'</span></div><div class="nps-row"><span style="color:#ffa657;width:90px">Pasivos</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?pa/nv.length*100:0)+'%;background:#ffa657"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+pa+'</span></div><div class="nps-row"><span style="color:#f85149;width:90px">Detractores</span><div class="nps-bar"><div class="nps-bar-fill" style="width:'+(nv.length?dt/nv.length*100:0)+'%;background:#f85149"></div></div><span style="color:#7d8590;width:24px;text-align:right">'+dt+"</span></div>";}
 function mk(id,type,dt,opts){if(ch[id])ch[id].destroy();var ctx=document.getElementById(id);if(!ctx)return;var sc={x:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}},y:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}}};ch[id]=new Chart(ctx,{type:type,data:dt,options:Object.assign({plugins:{legend:{labels:{color:"#7d8590",font:{size:11},boxWidth:12}}}},opts||{},{scales:(opts||{}).scales||sc})});}
-function renderCharts(){
-  var T="rgba(196,87,42,0.7)",sc={x:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}},y:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}}};
-  var bd={};data.forEach(function(d){var t=(d.Fecha||"").split(",")[0].trim();if(t)bd[t]=(bd[t]||0)+1;});
-  mk("chartTimeline","bar",{labels:Object.keys(bd),datasets:[{label:"Respuestas",data:Object.values(bd),backgroundColor:"rgba(196,87,42,0.5)",borderColor:T,borderWidth:1,borderRadius:4}]},{scales:sc});
-  var cc=cnt(data,"Canal",CAN);mk("chartCanal","doughnut",{labels:Object.keys(cc),datasets:[{data:Object.values(cc),backgroundColor:["#C4572A","#3fb950","#58a6ff","#ffa657","#bc8cff","#f85149"],borderWidth:0}]});
-  var mc=cnt(data,"Motivo",MOT);mk("chartMotivo","bar",{labels:Object.keys(mc),datasets:[{label:"",data:Object.values(mc),backgroundColor:"rgba(88,166,255,0.6)",borderColor:"#58a6ff",borderWidth:1,borderRadius:4}]},{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:"#7d8590",font:{size:10}}}}});
-  mk("chartGrupo","pie",{labels:Object.keys(cnt(data,"Grupo")),datasets:[{data:Object.values(cnt(data,"Grupo")),backgroundColor:["#C4572A","#3fb950","#58a6ff","#ffa657"],borderWidth:0}]});
-  var pc=cnt(data,"Precio"),pm={excelente:"Excelente",buena:"Buena",regular:"Regular",cara:"Cara"};mk("chartPrecio","doughnut",{labels:Object.keys(pc).map(function(k){return pm[k]||k;}),datasets:[{data:Object.values(pc),backgroundColor:["#3fb950","#58a6ff","#ffa657","#f85149"],borderWidth:0}]});
-  mk("chartEdad","bar",{labels:Object.keys(cnt(data,"Edad")),datasets:[{label:"",data:Object.values(cnt(data,"Edad")),backgroundColor:"rgba(188,140,255,0.6)",borderColor:"#bc8cff",borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});
-  var co={};data.forEach(function(d){(d.Contacto||"").split(",").forEach(function(c){c=c.trim();if(c)co[c]=(co[c]||0)+1;});});
-  var cm2={whatsapp:"WhatsApp",email:"Email",instagram:"Instagram",ninguno:"Sin contacto"};mk("chartContacto","bar",{labels:Object.keys(co).map(function(k){return cm2[k]||k;}),datasets:[{label:"",data:Object.values(co),backgroundColor:"rgba(63,185,80,0.5)",borderColor:"#3fb950",borderWidth:1,borderRadius:4}]},{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:"#7d8590"}}}});
-  var nd=Array(11).fill(0);data.forEach(function(d){var v=parseInt(d.NPS);if(!isNaN(v)&&v>=0&&v<=10)nd[v]++;});
-  mk("chartNPS","bar",{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{label:"",data:nd,backgroundColor:nd.map(function(_,i){return i<=6?"rgba(248,81,73,0.7)":i<=8?"rgba(255,166,87,0.7)":"rgba(63,185,80,0.7)";}),borderWidth:0,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});
-  ["Comida","Servicio","Ambiente"].forEach(function(d){var v=data.map(function(x){return parseFloat(x["Estrellas "+d]);}).filter(function(x){return !isNaN(x)&&x>=1&&x<=5;});document.getElementById("avg"+d).textContent=v.length?avg(v).toFixed(1):"—";mk("chart"+d,"bar",{labels:["1★","2★","3★","4★","5★"],datasets:[{data:[1,2,3,4,5].map(function(s){return v.filter(function(x){return x===s;}).length;}),backgroundColor:"rgba(196,87,42,0.5)",borderColor:T,borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});});
-  var mx=Math.max.apply(null,Object.values(cc).concat([1]));document.getElementById("canalBars").innerHTML=Object.entries(cc).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div class="canal-bar"><div class="canal-name">'+e[0]+'</div><div class="canal-track"><div class="canal-fill" style="width:'+e[1]/mx*100+'%"></div></div><div class="canal-count">'+e[1]+'</div></div>';}).join("");
-}
-function renderTable(){
-  var tb=document.getElementById("tableBody");tb.innerHTML="";
-  data.slice().reverse().forEach(function(d){
-    var nps=parseInt(d.NPS),nc=nps>=9?"#3fb950":nps>=7?"#ffa657":"#f85149",st="⭐".repeat(parseInt(d["Estrellas General"])||0);
-    var tr=document.createElement("tr");
-    tr.innerHTML='<td style="color:var(--muted);white-space:nowrap">'+(d.Fecha||"").substring(0,16)+'</td><td style="font-weight:500">'+(d.Nombre||"—")+'</td><td style="color:var(--muted)">'+(d.Telefono||"—")+'</td><td><span class="badge" style="background:rgba(196,87,42,0.1);color:var(--terra)">'+(CAN[d.Canal]||d.Canal||"—")+'</span></td><td style="color:var(--terra)">'+st+'</td><td><span style="font-weight:700;color:'+nc+'">'+(isNaN(nps)?"—":nps)+'</span></td><td style="color:'+(d["Primera visita"]==="sí"?"var(--green)":"var(--muted)")+'">'+(d["Primera visita"]==="sí"?"✓ Sí":"No")+'</td><td>'+(MOT[d.Motivo]||d.Motivo||"—")+'</td><td style="color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(d.Mejora||"")+'</td>';
-    tb.appendChild(tr);
-  });
-}
-function renderExperiencia(){
-  var gc={};data.forEach(function(d){(d["Lo que gusto"]||"").split(",").forEach(function(v){v=v.trim();if(v)gc[v]=(gc[v]||0)+1;});});
-  var total=data.length||1,sorted=Object.entries(gc).sort(function(a,b){return b[1]-a[1];}),maxG=sorted.length?sorted[0][1]:1;
-  document.getElementById("heatmapContainer").innerHTML=sorted.length?sorted.map(function(e){var pct=Math.round(e[1]/total*100),w=Math.round(e[1]/maxG*100);return '<div class="heat-row"><div class="heat-label">'+(GUSTO[e[0]]||e[0])+'</div><div class="heat-bar-wrap"><div class="heat-bar" style="width:'+w+'%"></div><span class="heat-pct">'+pct+'%</span></div><div class="heat-count">'+e[1]+'</div></div>';}).join(""):'<div class="empty-msg">Sin datos aún</div>';
-  var pc2=cnt(data,"Precio"),pcC={excelente:"#3fb950",buena:"#58a6ff",regular:"#ffa657",cara:"#f85149"},pm2={excelente:"Excelente",buena:"Buena",regular:"Regular",cara:"Cara"};
-  if(ch.chartPrecioExp)ch.chartPrecioExp.destroy();
-  var ctx2=document.getElementById("chartPrecioExp");
-  if(ctx2&&Object.keys(pc2).length)ch.chartPrecioExp=new Chart(ctx2,{type:"doughnut",data:{labels:Object.keys(pc2).map(function(k){return pm2[k]||k;}),datasets:[{data:Object.values(pc2),backgroundColor:Object.keys(pc2).map(function(k){return pcC[k]||"#7d8590";}),borderWidth:2,borderColor:"#161b22"}]},options:{plugins:{legend:{position:"bottom",labels:{color:"#7d8590",font:{size:11},boxWidth:14}}}}});
-  var pos=(pc2.excelente||0)+(pc2.buena||0),pctPos=data.length?Math.round(pos/data.length*100):0;
-  document.getElementById("precioSummary").innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+(pc2.excelente?'<span class="precio-badge" style="background:rgba(63,185,80,0.15);color:#3fb950">Excelente: '+pc2.excelente+'</span>':"")+(pc2.buena?'<span class="precio-badge" style="background:rgba(88,166,255,0.15);color:#58a6ff">Buena: '+pc2.buena+'</span>':"")+(pc2.regular?'<span class="precio-badge" style="background:rgba(255,166,87,0.15);color:#ffa657">Regular: '+pc2.regular+'</span>':"")+(pc2.cara?'<span class="precio-badge" style="background:rgba(248,81,73,0.15);color:#f85149">Cara: '+pc2.cara+'</span>':"")+'<span class="precio-badge" style="background:rgba(63,185,80,0.1);color:#3fb950">✔ '+pctPos+'% positiva</span></div>';
-}
+function renderCharts(){var T="rgba(196,87,42,0.7)",sc={x:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}},y:{grid:{color:"#21262d"},ticks:{color:"#7d8590",font:{size:10}}}};var bd={};data.forEach(function(d){var t=(d.Fecha||"").split(",")[0].trim();if(t)bd[t]=(bd[t]||0)+1;});mk("chartTimeline","bar",{labels:Object.keys(bd),datasets:[{label:"Respuestas",data:Object.values(bd),backgroundColor:"rgba(196,87,42,0.5)",borderColor:T,borderWidth:1,borderRadius:4}]},{scales:sc});var cc=cnt(data,"Canal",CAN);mk("chartCanal","doughnut",{labels:Object.keys(cc),datasets:[{data:Object.values(cc),backgroundColor:["#C4572A","#3fb950","#58a6ff","#ffa657","#bc8cff","#f85149"],borderWidth:0}]});var mc=cnt(data,"Motivo",MOT);mk("chartMotivo","bar",{labels:Object.keys(mc),datasets:[{label:"",data:Object.values(mc),backgroundColor:"rgba(88,166,255,0.6)",borderColor:"#58a6ff",borderWidth:1,borderRadius:4}]},{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:"#7d8590",font:{size:10}}}}});mk("chartGrupo","pie",{labels:Object.keys(cnt(data,"Grupo")),datasets:[{data:Object.values(cnt(data,"Grupo")),backgroundColor:["#C4572A","#3fb950","#58a6ff","#ffa657"],borderWidth:0}]});var pc=cnt(data,"Precio"),pm={excelente:"Excelente",buena:"Buena",regular:"Regular",cara:"Cara"};mk("chartPrecio","doughnut",{labels:Object.keys(pc).map(function(k){return pm[k]||k;}),datasets:[{data:Object.values(pc),backgroundColor:["#3fb950","#58a6ff","#ffa657","#f85149"],borderWidth:0}]});mk("chartEdad","bar",{labels:Object.keys(cnt(data,"Edad")),datasets:[{label:"",data:Object.values(cnt(data,"Edad")),backgroundColor:"rgba(188,140,255,0.6)",borderColor:"#bc8cff",borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});var co={};data.forEach(function(d){(d.Contacto||"").split(",").forEach(function(c){c=c.trim();if(c)co[c]=(co[c]||0)+1;});});var cm2={whatsapp:"WhatsApp",email:"Email",instagram:"Instagram",ninguno:"Sin contacto"};mk("chartContacto","bar",{labels:Object.keys(co).map(function(k){return cm2[k]||k;}),datasets:[{label:"",data:Object.values(co),backgroundColor:"rgba(63,185,80,0.5)",borderColor:"#3fb950",borderWidth:1,borderRadius:4}]},{indexAxis:"y",plugins:{legend:{display:false}},scales:{x:sc.x,y:{grid:{display:false},ticks:{color:"#7d8590"}}}});var nd=Array(11).fill(0);data.forEach(function(d){var v=parseInt(d.NPS);if(!isNaN(v)&&v>=0&&v<=10)nd[v]++;});mk("chartNPS","bar",{labels:[0,1,2,3,4,5,6,7,8,9,10],datasets:[{label:"",data:nd,backgroundColor:nd.map(function(_,i){return i<=6?"rgba(248,81,73,0.7)":i<=8?"rgba(255,166,87,0.7)":"rgba(63,185,80,0.7)";}),borderWidth:0,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});["Comida","Servicio","Ambiente"].forEach(function(d){var v=data.map(function(x){return parseFloat(x["Estrellas "+d]);}).filter(function(x){return !isNaN(x)&&x>=1&&x<=5;});document.getElementById("avg"+d).textContent=v.length?avg(v).toFixed(1):"—";mk("chart"+d,"bar",{labels:["1★","2★","3★","4★","5★"],datasets:[{data:[1,2,3,4,5].map(function(s){return v.filter(function(x){return x===s;}).length;}),backgroundColor:"rgba(196,87,42,0.5)",borderColor:T,borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}},scales:sc});});var mx=Math.max.apply(null,Object.values(cc).concat([1]));document.getElementById("canalBars").innerHTML=Object.entries(cc).sort(function(a,b){return b[1]-a[1];}).map(function(e){return '<div class="canal-bar"><div class="canal-name">'+e[0]+'</div><div class="canal-track"><div class="canal-fill" style="width:'+e[1]/mx*100+'%"></div></div><div class="canal-count">'+e[1]+"</div></div>";}).join("");}
+function renderTable(){var tb=document.getElementById("tableBody");tb.innerHTML="";data.slice().reverse().forEach(function(d){var nps=parseInt(d.NPS),nc=nps>=9?"#3fb950":nps>=7?"#ffa657":"#f85149",st="⭐".repeat(parseInt(d["Estrellas General"])||0);var tr=document.createElement("tr");tr.innerHTML='<td style="color:var(--muted);white-space:nowrap">'+(d.Fecha||"").substring(0,16)+'</td><td style="font-weight:500">'+(d.Nombre||"—")+'</td><td style="color:var(--muted)">'+(d.Telefono||"—")+'</td><td><span class="badge" style="background:rgba(196,87,42,0.1);color:var(--terra)">'+(CAN[d.Canal]||d.Canal||"—")+'</span></td><td style="color:var(--terra)">'+st+'</td><td><span style="font-weight:700;color:'+nc+'">'+( isNaN(nps)?"—":nps)+'</span></td><td style="color:'+(d["Primera visita"]==="sí"?"var(--green)":"var(--muted)")+'">'+(d["Primera visita"]==="sí"?"✓ Sí":"No")+'</td><td>'+(MOT[d.Motivo]||d.Motivo||"—")+'</td><td style="color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(d.Mejora||"")+"</td>";tb.appendChild(tr);});}
+function renderExperiencia(){var gc={};data.forEach(function(d){(d["Lo que gusto"]||"").split(",").forEach(function(v){v=v.trim();if(v)gc[v]=(gc[v]||0)+1;});});var total=data.length||1,sorted=Object.entries(gc).sort(function(a,b){return b[1]-a[1];}),maxG=sorted.length?sorted[0][1]:1;document.getElementById("heatmapContainer").innerHTML=sorted.length?sorted.map(function(e){var pct=Math.round(e[1]/total*100),w=Math.round(e[1]/maxG*100);return '<div class="heat-row"><div class="heat-label">'+(GUSTO[e[0]]||e[0])+'</div><div class="heat-bar-wrap"><div class="heat-bar" style="width:'+w+'%"></div><span class="heat-pct">'+pct+'%</span></div><div class="heat-count">'+e[1]+"</div></div>";}).join(""):'<div class="empty-msg">Sin datos aún</div>';var pc2=cnt(data,"Precio"),pcC={excelente:"#3fb950",buena:"#58a6ff",regular:"#ffa657",cara:"#f85149"},pm2={excelente:"Excelente",buena:"Buena",regular:"Regular",cara:"Cara"};if(ch.chartPrecioExp)ch.chartPrecioExp.destroy();var ctx2=document.getElementById("chartPrecioExp");if(ctx2&&Object.keys(pc2).length)ch.chartPrecioExp=new Chart(ctx2,{type:"doughnut",data:{labels:Object.keys(pc2).map(function(k){return pm2[k]||k;}),datasets:[{data:Object.values(pc2),backgroundColor:Object.keys(pc2).map(function(k){return pcC[k]||"#7d8590";}),borderWidth:2,borderColor:"#161b22"}]},options:{plugins:{legend:{position:"bottom",labels:{color:"#7d8590",font:{size:11},boxWidth:14}}}}});var pos=(pc2.excelente||0)+(pc2.buena||0),pctPos=data.length?Math.round(pos/data.length*100):0;document.getElementById("precioSummary").innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">'+(pc2.excelente?'<span class="precio-badge" style="background:rgba(63,185,80,0.15);color:#3fb950">Excelente: '+pc2.excelente+"</span>":"")+(pc2.buena?'<span class="precio-badge" style="background:rgba(88,166,255,0.15);color:#58a6ff">Buena: '+pc2.buena+"</span>":"")+(pc2.regular?'<span class="precio-badge" style="background:rgba(255,166,87,0.15);color:#ffa657">Regular: '+pc2.regular+"</span>":"")+(pc2.cara?'<span class="precio-badge" style="background:rgba(248,81,73,0.15);color:#f85149">Cara: '+pc2.cara+"</span>":"")+"</div>";}
 function renderComentarios(){
   var mj=data.slice().reverse().filter(function(d){return d.Mejora&&d.Mejora.trim();});
   document.getElementById("cntMejoras").textContent="("+mj.length+")";
-  var mjHtml=mj.length?mj.map(function(d){
-    var fecha=d.Fecha?d.Fecha.substring(0,10):"";
-    var motivo=(MOT[d.Motivo]||d.Motivo||"");
-    var npsStr=d.NPS?" · NPS "+d.NPS:"";
-    return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+fecha+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+motivo+npsStr+'</div></div>';
-  }).join(""):'<div class="empty-msg">Sin sugerencias aún</div>';
+  var mjHtml=mj.length?mj.map(function(d){var f=d.Fecha?d.Fecha.substring(0,10):"";var m=(MOT[d.Motivo]||d.Motivo||"");var ns=d.NPS?" · NPS "+d.NPS:"";return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+f+'</span></div><div class="cd">“'+d.Mejora+'”</div><div class="cf">'+m+ns+"</div></div>";}).join(""):'<div class="empty-msg">Sin sugerencias aún</div>';
   document.getElementById("listaMejoras").innerHTML=mjHtml;
   var ce=data.slice().reverse().filter(function(d){return d["comentario al equipo"]&&d["comentario al equipo"].trim();});
   document.getElementById("cntComentarios").textContent="("+ce.length+")";
-  var ceHtml=ce.length?ce.map(function(d){
-    var fecha=d.Fecha?d.Fecha.substring(0,10):"";
-    var com=d["comentario al equipo"];
-    return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+fecha+'</span></div><div class="cd">“'+com+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d["Estrellas General"]+'</div></div>';
-  }).join(""):'<div class="empty-msg">Sin comentarios al equipo aún</div>';
+  var ceHtml=ce.length?ce.map(function(d){var f=d.Fecha?d.Fecha.substring(0,10):"";var com=d["comentario al equipo"];return '<div class="comment-card"><div class="cn">'+d.Nombre+'<span style="color:var(--muted);font-weight:400;margin-left:8px;font-size:11px">'+f+'</span></div><div class="cd">“'+com+'”</div><div class="cf">NPS: '+d.NPS+' · ⭐ '+d["Estrellas General"]+"</div></div>";}).join(""):'<div class="empty-msg">Sin comentarios al equipo aún</div>';
   document.getElementById("listaComentarios").innerHTML=ceHtml;
 }
-function switchTab(id){
-  document.querySelectorAll(".section").forEach(function(s){s.classList.remove("active");});
-  document.querySelectorAll(".tab,.nav-item").forEach(function(t){t.classList.remove("active");});
-  document.getElementById("sec-"+id)&&document.getElementById("sec-"+id).classList.add("active");
-  document.getElementById("tab-"+id)&&document.getElementById("tab-"+id).classList.add("active");
-  document.querySelectorAll(".nav-item").forEach(function(n){if(n.getAttribute("onclick")&&n.getAttribute("onclick").indexOf(id)>-1)n.classList.add("active");});
-  if(id==="experiencia")renderExperiencia();
-  if(id==="comentarios")renderComentarios();
-  setTimeout(function(){Object.values(ch).forEach(function(c){c.resize();});},100);
-}
+function switchTab(id){document.querySelectorAll(".section").forEach(function(s){s.classList.remove("active");});document.querySelectorAll(".tab,.nav-item").forEach(function(t){t.classList.remove("active");});document.getElementById("sec-"+id)&&document.getElementById("sec-"+id).classList.add("active");document.getElementById("tab-"+id)&&document.getElementById("tab-"+id).classList.add("active");document.querySelectorAll(".nav-item").forEach(function(n){if(n.getAttribute("onclick")&&n.getAttribute("onclick").indexOf(id)>-1)n.classList.add("active");});if(id==="experiencia")renderExperiencia();if(id==="comentarios")renderComentarios();setTimeout(function(){Object.values(ch).forEach(function(c){c.resize();});},100);}
 loadData();
 setInterval(loadData,120000);
-</script></body></html>
+</script>
+</body></html>
